@@ -1,0 +1,78 @@
+.container {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 4rem;
+  position: relative;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 18px;
+
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.navigation {
+  font-size: 18px;
+  color: white;
+  transition: 0.3s;
+}
+
+.navigation:hover {
+  color: rgba(245, 245, 245, 0.488);
+}
+
+.menuButton {
+  background-color: grey;
+  display: none;
+}
+
+@media screen and (max-width: 768px) {
+
+  .container {
+    padding: 1rem 1.5rem;
+  }
+
+  .menuButton{
+    display: block;
+  }
+
+  .menuButton:hover {
+    cursor: pointer;
+  }
+
+  .navbar {
+    visibility: hidden;
+    flex-direction: column;
+    width: 100vw;
+    height: 0;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transition: 0.4s;
+    opacity: 0;
+    transform: translate(-50%, 0%);
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  .open {
+    visibility: visible;
+    opacity: 100%;
+    padding-top: 5rem;
+    transform: translate(-50%, 5%);
+    height: 92vh;
+    background-color: grey;
+    pointer-events: fill;
+  }
+  .navigation {
+    font-size: 40px;
+  }
+}
