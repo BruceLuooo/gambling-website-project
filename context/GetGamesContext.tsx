@@ -8,11 +8,9 @@ interface getGames {
 	awayTeam: string;
 	startTime: string;
 	teamOneOdds: {
-		name: string;
 		odds: number;
 	};
 	teamTwoOdds: {
-		name: string;
 		odds: number;
 	};
 }
@@ -31,15 +29,15 @@ export const GetGamesProvider = ({ children }: Props) => {
 	const [upcomingGames, setUpcomingGames] = useState<getGames[]>([]);
 
 	useEffect(() => {
+		let information: any[] = [];
 		const options = {
 			method: 'GET',
 			url: 'https://odds.p.rapidapi.com/v4/sports/basketball/odds',
 			params: {
-				sport: 'basketball',
 				regions: 'us',
-				dateFormat: 'iso',
 				oddsFormat: 'decimal',
-				markets: 'h2h,spreads',
+				markets: 'h2h',
+				dateFormat: 'unix',
 			},
 			headers: {
 				'X-RapidAPI-Key': '2cbb011960msh3ff72f4f58249a1p127b8bjsnc63ffc1d70d9',
@@ -49,23 +47,20 @@ export const GetGamesProvider = ({ children }: Props) => {
 		const getUpcomingGames = async () => {
 			await axios.request(options).then(response => {
 				response.data.forEach((data: any) => {
-					setUpcomingGames(prev => [
-						...prev,
-						{
-							id: data.id,
-							homeTeam: data.home_team,
-							awayTeam: data.away_team,
-							startTime: data.commence_time,
-							teamOneOdds: {
-								name: data.bookmakers[0].markets[0].outcomes[0].name,
-								odds: data.bookmakers[0].markets[0].outcomes[0].price,
-							},
-							teamTwoOdds: {
-								name: data.bookmakers[0].markets[0].outcomes[1].name,
-								odds: data.bookmakers[0].markets[0].outcomes[1].price,
-							},
+					console.log(data);
+					information.push({
+						id: data.id,
+						homeTeam: data.home_team,
+						awayTeam: data.away_team,
+						startTime: data.commence_time,
+						teamOneOdds: {
+							odds: data.bookmakers[0].markets[0].outcomes[0].price,
 						},
-					]);
+						teamTwoOdds: {
+							odds: data.bookmakers[0].markets[0].outcomes[1].price,
+						},
+					});
+					setUpcomingGames(information);
 				});
 			});
 		};

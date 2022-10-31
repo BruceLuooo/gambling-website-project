@@ -12,11 +12,9 @@ interface getGames {
 	awayTeam: string;
 	startTime: string;
 	teamOneOdds: {
-		name: string;
 		odds: number;
 	};
 	teamTwoOdds: {
-		name: string;
 		odds: number;
 	};
 }
@@ -28,6 +26,8 @@ type GamesContext = {
 export default function Home() {
 	const { upcomingGames } = useContext(GetGamesContext) as GamesContext;
 
+	const [games, setGames] = useState(true);
+
 	return (
 		<div className={styles.container}>
 			<Head>
@@ -37,33 +37,51 @@ export default function Home() {
 
 			<main className={styles.mainContainer}>
 				<div className={styles.navigationContainer}>
-					<button className={styles.navigation}>UpComing Games</button>
-					<button className={styles.navigation}>Finished Games</button>
+					<button
+						className={`${styles.navigation} `}
+						onClick={() => setGames(true)}
+					>
+						Games
+					</button>
+					<button
+						className={`${styles.navigation} `}
+						onClick={() => setGames(false)}
+					>
+						Completed
+					</button>
+					<span
+						className={`${styles.underline} ${
+							!games ? styles.active : styles.notActive
+						}`}
+					/>
 				</div>
-				<div className={styles.upcomingGamesContainer}>
-					{upcomingGames.map((game, index) => (
-						<Link
-							className={styles.displayGameGridContainer}
-							key={index}
-							href={`/placebet/${game.id}`}
-							// href={{ pathname: '/placebet', query: { id: game.id } }}
-						>
-							<div className={`${styles.date} ${styles.gridColSpanFive}`}>
-								{game.startTime}
-							</div>
-							<p className={styles.winnerSentence}>Winner (Incl. Overtime)</p>
-							<div className={`${styles.team} ${styles.alignTeamAndOdds}`}>
-								<p className={styles.fontSize}>{game.homeTeam}</p>
-								<p className={styles.fontSize}>{game.teamOneOdds.odds}</p>
-							</div>
-							<p className={styles.versus}>vs</p>
-
-							<div className={`${styles.teamTwo} ${styles.alignTeamAndOdds}`}>
-								<p className={styles.fontSize}>{game.awayTeam}</p>
-								<p className={styles.fontSize}>{game.teamTwoOdds.odds}</p>
-							</div>
-						</Link>
-					))}
+				<div className={styles.gamesContainer}>
+					{games ? (
+						upcomingGames.map((game, index) => (
+							<Link
+								className={styles.displayGameGridContainer}
+								key={index}
+								href={`/placebet/${game.id}`}
+								// href={{ pathname: '/placebet', query: { id: game.id } }}
+							>
+								<div className={`${styles.date} `}>{game.startTime}</div>
+								<p className={styles.winnerSentence}>Winner (Incl. Overtime)</p>
+								<div className={`${styles.team} ${styles.alignTeamAndOdds}`}>
+									<p className={styles.fontSize}>{game.homeTeam}</p>
+									<p className={styles.fontSize}>{game.teamOneOdds.odds}</p>
+								</div>
+								<p className={styles.versus}>vs</p>
+								<hr className={`${styles.thinLine} ${styles.thinLineMiddle}`} />
+								<hr className={`${styles.thinLine} ${styles.thinLineEnd}`} />
+								<div className={`${styles.teamTwo} ${styles.alignTeamAndOdds}`}>
+									<p className={styles.fontSize}>{game.awayTeam}</p>
+									<p className={styles.fontSize}>{game.teamTwoOdds.odds}</p>
+								</div>
+							</Link>
+						))
+					) : (
+						<div>Finished Games</div>
+					)}
 				</div>
 			</main>
 		</div>
