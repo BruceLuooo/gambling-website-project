@@ -32,7 +32,7 @@ export const GetGamesProvider = ({ children }: Props) => {
 		let information: any[] = [];
 		const options = {
 			method: 'GET',
-			url: 'https://odds.p.rapidapi.com/v4/sports/basketball/odds',
+			url: 'https://odds.p.rapidapi.com/v4/sports/basketball_nba/odds',
 			params: {
 				regions: 'us',
 				oddsFormat: 'decimal',
@@ -47,12 +47,32 @@ export const GetGamesProvider = ({ children }: Props) => {
 		const getUpcomingGames = async () => {
 			await axios.request(options).then(response => {
 				response.data.forEach((data: any) => {
-					console.log(data);
+					const milliseconds = data.commence_time * 1000;
+					const timeStamp = new Date(milliseconds);
+					const date = timeStamp.toLocaleDateString('en-US', {
+						weekday: 'long',
+						month: 'long',
+						day: 'numeric',
+						hour: 'numeric',
+						minute: 'numeric',
+					});
+
+					console.log(date);
+
+					const currentTime = new Date();
+					const currentTimeString = currentTime.toLocaleDateString('en-US', {
+						weekday: 'long',
+						month: 'long',
+						day: 'numeric',
+						hour: 'numeric',
+						minute: 'numeric',
+					});
+
 					information.push({
 						id: data.id,
 						homeTeam: data.home_team,
 						awayTeam: data.away_team,
-						startTime: data.commence_time,
+						startTime: date > currentTimeString ? date : 'Live',
 						teamOneOdds: {
 							odds: data.bookmakers[0].markets[0].outcomes[0].price,
 						},

@@ -3,6 +3,7 @@ import Image from 'next/image';
 import styles from '../styles/navbar.module.css';
 import Link from 'next/link';
 import menu from '../public/hamburger.png';
+import logo from '../public/logo.png';
 
 export default function Navbar() {
 	const [openMenu, setOpenMenu] = useState(false);
@@ -21,8 +22,8 @@ export default function Navbar() {
 	return (
 		<div className={styles.container}>
 			<div className={styles.logo}>
-				<div>Logo</div>
-				<div>Betting Odds</div>
+				<Image src={logo} alt={'Logo'} width={80} />
+				<Link href='/'>BetScore</Link>
 			</div>
 			<div className={`${styles.navbar} ${openMenu && styles.open}`}>
 				<Link href='/myBets' className={styles.navigation}>

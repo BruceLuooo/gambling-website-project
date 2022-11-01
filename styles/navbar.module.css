@@ -8,9 +8,8 @@
 .logo {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  font-size: 18px;
-
+  gap: 0.5rem;
+  font-size: 22px;
 }
 
 .navbar {
@@ -20,7 +19,7 @@
 }
 
 .navigation {
-  font-size: 18px;
+  font-size: 22px;
   color: white;
   transition: 0.3s;
 }

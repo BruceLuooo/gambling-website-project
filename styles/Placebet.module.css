@@ -1,0 +1,139 @@
+.mainContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3rem;
+  margin-top: 5rem;
+  padding: 0 3vw;
+  width: 100%;
+}
+.bettingContainer {
+  padding: 2.5rem;
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  max-width: 800px;
+  width: 100%;
+  gap: 1rem;
+  border: 1px solid white;
+}
+
+.backArrow {
+  position: absolute;
+  top: 4rem;
+  background-color: white;
+}
+
+.header{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+.game{
+  font-size: 30px;
+}
+.date{
+  font-size: 24px;
+}
+
+.odds{
+  display: flex;
+  width: 100%;
+  gap: 1rem;
+  margin-top: 4rem;
+}
+.teamOdds{
+  display: flex;
+  justify-content: space-between;
+  max-width: 50%;
+  width: 100%;
+  padding: 1rem 2rem;
+  margin-left: 1rem;
+  border: 1px solid white;
+  border-radius: 5px;
+  transition: 0.3s;
+}
+.teamOdds:hover{
+  cursor: pointer;
+  background-color: rgb(84, 83, 83);
+}
+.selected {
+  background-color: rgb(84, 83, 83);
+}
+
+.placeBetContainer{
+  margin-top: 4rem;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: auto;
+  gap: 1rem;
+}
+.titleLabel{
+  grid-column: 1/7;
+}
+.winnerLabel{
+  grid-column: 1/6;
+}
+.oddsLabel{
+  display: flex;
+  justify-content: flex-end;
+}
+.placedBet{
+  display: grid;
+  grid-column: 1/7;
+  grid-template-columns: repeat(6,1fr);
+  grid-template-rows: repeat(4,1fr);
+}
+.enterAmount{
+  display: flex;
+  align-items: center;
+  position: relative;
+  grid-column: 1/4;
+  grid-row: 1/4;
+}
+.dollarSign{
+  position: absolute;
+  left: 7rem;
+  
+}
+.estimatedAmountLabel{
+  display: flex;
+  justify-content: flex-end;
+  grid-column: 5/7;
+}
+.estimatedAmount{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  grid-column: 5/7;
+  grid-row: 1/4;
+  gap: 0.5rem;
+}
+.balance {
+  grid-row: 4;
+}
+
+.placeBet{
+  margin-top: 1rem;
+  height: 2rem;
+  border: none;
+  font-size: 16px;
+}
+.placeBet:hover{
+  cursor: pointer;
+}
+
+@media screen and (max-width: 768px) {
+  .bettingContainer {
+    padding: 2.5rem 0.5rem;
+    border: none;
+  }
+  .game{
+    font-size: 16px;
+  }
+
+  .date{
+    font-size: 16px;
+  }
+}
