@@ -1,0 +1,131 @@
+.thinLine {
+  position: relative;
+  top: 0.5rem;
+  height: 2px;
+  border: 0;
+  color: #333;
+  background-color: #333;
+  width: 90%;
+}
+
+.thinLineMiddle {
+  grid-column: 4/7;
+}
+.thinLineEnd {
+  grid-column: 10/13;
+  grid-row: 1;
+}
+
+.displayGameGridContainer{
+  display: grid;
+  grid-template-columns: repeat(12, 1fr) ;
+  grid-template-rows: 2rem 2.5rem 3rem ;
+}
+
+.date {
+  display: flex;
+  align-items: center;
+  grid-column: span 3;
+  font-size: 12px;
+}
+
+.live {
+  color: rgb(208, 10, 10);
+  font-size: 16px;
+}
+
+.winnerSentence {
+  grid-row: 1;
+  grid-column: 7/10;
+  display: flex;
+  justify-self: center;
+  align-items: center;
+  font-size: 13px;
+}
+
+.dash {
+  display: none;
+}
+
+.teams {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+  grid-row: 2/4;
+  grid-column: 1/5;
+}
+
+.fontSize {
+  font-size: 14px;
+}
+
+.scoreContainer {
+  display: flex;
+  gap: 0.5rem;
+  grid-row: 2/5;
+  grid-column: 6/11;
+}
+
+.teamPoints {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+  max-width: 800px;
+  width: 100%;
+}
+
+@media screen and (max-width: 1283px) {
+
+  .thinLineEnd {
+    grid-column: 10/13;
+  }
+}
+
+@media screen and (max-width: 768px) {
+
+  .displayGameGridContainer{
+    grid-template-rows: 2rem 2rem 2rem 2rem 2rem ;
+    margin-bottom: 2rem;
+  }
+
+  .teams {
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 0.5rem;
+    grid-row: 2/3;
+    grid-column: 1/13;
+  }
+
+  .dash {
+    display: contents;
+  }
+
+  .winnerSentence {
+    grid-row: 3;
+    grid-column: 4/10;
+    display: flex;
+    align-items: center;
+    font-size: 10px;
+  }
+
+  .thinLine.thinLineEnd {
+    display: none;
+  }
+  .thinLine.thinLineMiddle {
+    grid-column: 5/13 ;
+  }
+
+  .date {
+    grid-column: span 4;
+  }
+
+  .scoreContainer {
+    grid-row: 4/6;
+    grid-column: 1/13;
+  }
+
+}

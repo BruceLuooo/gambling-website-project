@@ -12,6 +12,7 @@
   display: flex;
   position: relative;
   flex-direction: column;
+  background-color: #0f0e0e;
   max-width: 800px;
   width: 100%;
   gap: 1rem;

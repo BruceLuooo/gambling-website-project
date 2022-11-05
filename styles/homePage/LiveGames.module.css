@@ -1,0 +1,47 @@
+.container {
+  display: flex;
+  gap: 1rem;
+}
+
+.gameContainer{
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  max-width: 200px;
+  width: 100%;
+  border: 1px solid white;
+  border-radius: 6px;
+}
+
+.live {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.smallFont{
+  font-size: 12px;
+}
+
+.teamsAndScores{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.teams{
+  display: flex;
+  flex-direction: column;
+}
+
+.overflow {
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.points{
+  display: flex;
+  flex-direction: column;
+}

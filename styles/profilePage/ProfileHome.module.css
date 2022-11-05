@@ -1,0 +1,26 @@
+.mainContainer {
+  display: flex;
+  gap: 2rem;
+  padding: 5rem 6rem;
+}
+
+.betsContainer {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid white;
+  max-width: 700px;
+  width: 100%;
+  padding: 2rem;
+  gap: 2rem;
+}
+
+.labelContainer{
+  display: flex;
+}
+.label{
+  font-size: 20px;
+  margin-left: 1rem;
+}
+.label:hover{
+  cursor: pointer;
+}

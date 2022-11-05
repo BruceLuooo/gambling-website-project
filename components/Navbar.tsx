@@ -4,9 +4,20 @@ import styles from '../styles/navbar.module.css';
 import Link from 'next/link';
 import menu from '../public/hamburger.png';
 import logo from '../public/logo.png';
+import { auth } from '../firebase.config';
+import { useRouter } from 'next/router';
 
 export default function Navbar() {
 	const [openMenu, setOpenMenu] = useState(false);
+
+	const router = useRouter();
+
+	const logout = () => {
+		auth.signOut();
+		localStorage.removeItem('token');
+		router.push('/');
+		setOpenMenu(false);
+	};
 
 	useEffect(() => {
 		function reportWindowSize() {
@@ -21,20 +32,23 @@ export default function Navbar() {
 
 	return (
 		<div className={styles.container}>
-			<div className={styles.logo}>
+			<Link href='/' className={styles.logo}>
 				<Image src={logo} alt={'Logo'} width={80} />
-				<Link href='/'>BetScore</Link>
-			</div>
+				<span>BetScore</span>
+			</Link>
 			<div className={`${styles.navbar} ${openMenu && styles.open}`}>
-				<Link href='/myBets' className={styles.navigation}>
-					My Bets
-				</Link>
 				<Link href='/news' className={styles.navigation}>
 					News
 				</Link>
 				<Link href='/login' className={styles.navigation}>
 					Login
 				</Link>
+				<Link href='/profile' className={styles.navigation}>
+					Profile
+				</Link>
+				<div onClick={logout} className={styles.navigation}>
+					Logout
+				</div>
 			</div>
 			<Image
 				src={menu}

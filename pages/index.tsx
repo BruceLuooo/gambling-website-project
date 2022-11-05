@@ -1,30 +1,102 @@
 import Head from 'next/head';
-import styles from '../styles/Home.module.css';
-import Link from 'next/link';
-import { useContext, useEffect, useState } from 'react';
-import { GetGamesContext } from '../context/GetGamesContext';
+import styles from '../styles/homePage/Home.module.css';
+import { useEffect, useState } from 'react';
+import UpcomingGames from '../components/homePage/UpcomingGames';
+import CompletedGames from '../components/homePage/CompletedGames';
+import News from '../components/homePage/News';
+import axios from 'axios';
+import LiveGames from '../components/homePage/LiveGames';
 
-interface getGames {
+interface CompletedGame {
 	id: string;
 	homeTeam: string;
 	awayTeam: string;
-	startTime: string;
-	teamOneOdds: {
-		odds: number;
+	homeTeamScore: {
+		score: string;
 	};
-	teamTwoOdds: {
-		odds: number;
+	awayTeamScore: {
+		score: string;
 	};
+	date: string;
+}
+interface LiveGame {
+	homeTeam: string;
+	awayTeam: string;
+	homeTeamScore: number;
+	awayTeamScore: number;
+	startingNow?: string;
 }
 
-type GamesContext = {
-	upcomingGames: getGames[];
-};
-
 export default function Home() {
-	const { upcomingGames } = useContext(GetGamesContext) as GamesContext;
-
 	const [games, setGames] = useState(true);
+
+	const [completedGames, setCompletedGames] = useState<CompletedGame[]>([]);
+	const [liveGames, setLiveGames] = useState<LiveGame[]>([]);
+
+	useEffect(() => {
+		let completedGames: CompletedGame[] = [];
+		let liveGames: LiveGame[] = [];
+
+		const options = {
+			method: 'GET',
+			url: 'https://odds.p.rapidapi.com/v4/sports/basketball_nba/scores',
+			params: { daysFrom: '2', dateFormat: 'unix' },
+			headers: {
+				'X-RapidAPI-Key': '2cbb011960msh3ff72f4f58249a1p127b8bjsnc63ffc1d70d9',
+				'X-RapidAPI-Host': 'odds.p.rapidapi.com',
+			},
+		};
+
+		axios.request(options).then(response => {
+			response.data.forEach((data: any) => {
+				if (data.completed === false) {
+					if (data.scores === null) {
+						liveGames.push({
+							homeTeam: data.home_team,
+							awayTeam: data.away_team,
+							homeTeamScore: 0,
+							awayTeamScore: 0,
+							startingNow: 'Starting',
+						});
+						return;
+					} else {
+						liveGames.push({
+							homeTeam: data.home_team,
+							awayTeam: data.away_team,
+							homeTeamScore: data.scores[0].score,
+							awayTeamScore: data.scores[1].score,
+						});
+						return;
+					}
+				}
+
+				const milliseconds = data.commence_time * 1000;
+				const timeStamp = new Date(milliseconds);
+				const date = timeStamp.toLocaleDateString('en-US', {
+					weekday: 'long',
+					month: 'long',
+					day: 'numeric',
+					hour: 'numeric',
+					minute: 'numeric',
+				});
+
+				completedGames.push({
+					id: data.id,
+					homeTeam: data.home_team,
+					awayTeam: data.away_team,
+					homeTeamScore: {
+						score: data.scores[0].score || '0',
+					},
+					awayTeamScore: {
+						score: data?.scores[1].score || '0',
+					},
+					date: date,
+				});
+			});
+			setCompletedGames(completedGames);
+			setLiveGames(liveGames);
+		});
+	}, []);
 
 	return (
 		<div className={styles.container}>
@@ -34,6 +106,9 @@ export default function Home() {
 			</Head>
 
 			<main className={styles.mainContainer}>
+				<div className={styles.liveGames}>
+					<LiveGames liveGames={liveGames} />
+				</div>
 				<div className={styles.introduction}>
 					<span className={styles.introHeader}>
 						Basketball Betting Simplified
@@ -43,73 +118,36 @@ export default function Home() {
 						odds and make big profits from the games you bet on!
 					</p>
 				</div>
-				<div className={styles.gamesContainer}>
-					<div className={styles.layover}>
-						<div className={styles.navigationContainer}>
-							<div
-								className={`${styles.navigation} `}
-								onClick={() => setGames(true)}
-							>
-								Games
-							</div>
-							<div
-								className={`${styles.navigation} `}
-								onClick={() => setGames(false)}
-							>
-								Completed
-							</div>
-							<span
-								className={`${styles.underline} ${
-									!games ? styles.active : styles.notActive
-								}`}
-							/>
-						</div>
-					</div>
-					{games ? (
-						upcomingGames.map((game, index) => (
-							<div className={styles.displayGameGridContainer} key={index}>
-								<span
-									className={`${styles.date} ${
-										game.startTime === 'Live' && styles.live
-									}`}
+				<div className={styles.newsAndGamesContainer}>
+					<div className={styles.gamesContainer}>
+						<div className={styles.layover}>
+							<div className={styles.navigationContainer}>
+								<div
+									className={`${styles.navigation} `}
+									onClick={() => setGames(true)}
 								>
-									{game.startTime}
-								</span>
-								<span className={styles.winnerSentence}>
-									Winner (Incl. Overtime)
-								</span>
-								<hr className={`${styles.thinLine} ${styles.thinLineMiddle}`} />
-								<hr className={`${styles.thinLine} ${styles.thinLineEnd}`} />
-								<div className={styles.teams}>
-									<span className={` ${styles.fontSize}`}>{game.homeTeam}</span>
-									<span className={styles.dash}>-</span>
-									<span className={`${styles.fontSize}`}>{game.awayTeam}</span>
+									Games
 								</div>
-								<div className={styles.buttonContainer}>
-									<Link
-										className={styles.button}
-										href={{ pathname: '/placebet', query: { id: game.id } }}
-									>
-										<div className={styles.test}>
-											<span className={styles.fontSize}>{game.homeTeam}</span>
-										</div>
-										<span>{game.teamOneOdds.odds}</span>
-									</Link>
-									<Link
-										className={styles.button}
-										href={{ pathname: '/placebet', query: { id: game.id } }}
-									>
-										<div className={styles.test}>
-											<span className={styles.fontSize}>{game.awayTeam}</span>
-										</div>
-										<span>{game.teamTwoOdds.odds}</span>
-									</Link>
+								<div
+									className={`${styles.navigation} `}
+									onClick={() => setGames(false)}
+								>
+									Completed
 								</div>
+								<span
+									className={`${styles.underline} ${
+										!games ? styles.active : styles.notActive
+									}`}
+								/>
 							</div>
-						))
-					) : (
-						<div>Finished Games</div>
-					)}
+						</div>
+						{games === true ? (
+							<UpcomingGames />
+						) : (
+							<CompletedGames completedGames={completedGames} />
+						)}
+					</div>
+					<News />
 				</div>
 			</main>
 		</div>

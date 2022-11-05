@@ -3,7 +3,12 @@ import Link from 'next/link';
 import Image from 'next/image';
 import React, { useContext, useEffect, useState } from 'react';
 import { GetGamesContext } from '../../context/GetGamesContext';
+import { PersonalInfoContext } from '../../context/personalInfoContext';
 import backArrow from '../../public/backArrow.svg';
+import { addDoc, collection } from 'firebase/firestore';
+import { db, auth } from '../../firebase.config';
+import useDelay from '../../hooks/useDelay';
+import { useRouter } from 'next/router';
 
 interface getGames {
 	id: string;
@@ -22,6 +27,18 @@ type GamesContext = {
 	upcomingGames: getGames[];
 };
 
+interface Info {
+	name: string;
+	lastname: string;
+	email: string;
+	balance: number;
+}
+
+type InfoContext = {
+	personalInfo: Info;
+	removeFromBalance: Function;
+};
+
 interface PlaceBet {
 	id: string | undefined;
 	team: string | undefined;
@@ -32,6 +49,21 @@ interface PlaceBet {
 
 export default function Placebet() {
 	const { upcomingGames } = useContext(GetGamesContext) as GamesContext;
+	const { delay, loading, setLoading } = useDelay();
+	const router = useRouter();
+
+	const currentTime = new Date();
+	const currentTimeString = currentTime.toLocaleDateString('en-US', {
+		weekday: 'long',
+		month: 'long',
+		day: 'numeric',
+		hour: 'numeric',
+		minute: 'numeric',
+	});
+
+	const { personalInfo, removeFromBalance } = useContext(
+		PersonalInfoContext,
+	) as InfoContext;
 
 	const [gameData, setGameData] = useState<getGames>({
 		id: '',
@@ -46,7 +78,7 @@ export default function Placebet() {
 		},
 	});
 	const [placedBet, setPlacedBet] = useState<PlaceBet>({
-		id: gameData.id,
+		id: '',
 		team: '',
 		odd: 0,
 		betAmount: 0,
@@ -56,14 +88,20 @@ export default function Placebet() {
 	useEffect(() => {
 		const queryString = window.location.search;
 		const urlParams = new URLSearchParams(queryString);
-
 		const id = urlParams.get('id');
-
 		const find = upcomingGames.find(data => data.id === id);
-
 		if (find) {
 			setGameData(find);
+			setPlacedBet(prev => ({
+				...prev,
+				id: find.id,
+			}));
 		}
+	}, [upcomingGames]);
+
+	const formatter = new Intl.NumberFormat('en-US', {
+		style: 'currency',
+		currency: 'USD',
 	});
 
 	const selectedWinningTeam = (team: string, odds: number) => {
@@ -78,8 +116,37 @@ export default function Placebet() {
 		setPlacedBet(prev => ({
 			...prev,
 			[e.target.id]: e.target.value,
+			estimatedWin: e.target.valueAsNumber * placedBet.odd,
 		}));
 	};
+
+	const submitBet = async () => {
+		setLoading(true);
+
+		try {
+			const docRef = collection(
+				db,
+				`/users/${auth.currentUser!.uid}/placedbets`,
+			);
+			await addDoc(docRef, placedBet);
+
+			removeFromBalance(placedBet.betAmount);
+			await delay(3000);
+			router.push('/profile');
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	if (loading) {
+		return (
+			<div className={styles.mainContainer}>
+				<div className={styles.bettingContainer}>
+					<span>loading...</span>
+				</div>
+			</div>
+		);
+	}
 
 	return (
 		<div className={styles.mainContainer}>
@@ -147,18 +214,23 @@ export default function Placebet() {
 								</span>
 							</div>
 						</div>
-						<span className={styles.balance}>Balance: $2343</span>
+						<span className={styles.balance}>
+							Balance: {formatter.format(personalInfo.balance)}
+						</span>
 					</div>
 				</div>
 				<button
 					className={styles.placeBet}
 					disabled={
+						//@ts-ignore
 						placedBet.betAmount === '' ||
 						placedBet.betAmount === 0 ||
+						placedBet.betAmount > personalInfo.balance ||
 						placedBet.team === ''
 							? true
 							: false
 					}
+					onClick={submitBet}
 				>
 					Place Bet
 				</button>
