@@ -41,7 +41,7 @@ type InfoContext = {
 
 interface PlaceBet {
 	id: string | undefined;
-	team: string | undefined;
+	winningTeam: string | undefined;
 	odd: number;
 	betAmount: number;
 	estimatedWin: number;
@@ -49,21 +49,22 @@ interface PlaceBet {
 
 export default function Placebet() {
 	const { upcomingGames } = useContext(GetGamesContext) as GamesContext;
+	const { personalInfo, removeFromBalance } = useContext(
+		PersonalInfoContext,
+	) as InfoContext;
 	const { delay, loading, setLoading } = useDelay();
 	const router = useRouter();
 
 	const currentTime = new Date();
-	const currentTimeString = currentTime.toLocaleDateString('en-US', {
-		weekday: 'long',
-		month: 'long',
-		day: 'numeric',
-		hour: 'numeric',
-		minute: 'numeric',
-	});
+	const convertDate = (timeStamp: string) => {
+		let date = new Date(timeStamp);
+		return `${date.toDateString()} ${date.toLocaleTimeString()}`;
+	};
 
-	const { personalInfo, removeFromBalance } = useContext(
-		PersonalInfoContext,
-	) as InfoContext;
+	const formatter = new Intl.NumberFormat('en-US', {
+		style: 'currency',
+		currency: 'USD',
+	});
 
 	const [gameData, setGameData] = useState<getGames>({
 		id: '',
@@ -79,7 +80,7 @@ export default function Placebet() {
 	});
 	const [placedBet, setPlacedBet] = useState<PlaceBet>({
 		id: '',
-		team: '',
+		winningTeam: '',
 		odd: 0,
 		betAmount: 0,
 		estimatedWin: 0,
@@ -99,23 +100,24 @@ export default function Placebet() {
 		}
 	}, [upcomingGames]);
 
-	const formatter = new Intl.NumberFormat('en-US', {
-		style: 'currency',
-		currency: 'USD',
-	});
-
-	const selectedWinningTeam = (team: string, odds: number) => {
+	const selectedWinningTeam = (
+		winningTeam: string,
+		winningOdds: number,
+		losingTeam: string,
+		losingOdds: number,
+	) => {
 		setPlacedBet(prev => ({
 			...prev,
-			team: team,
-			odd: odds,
+			winningTeam: `${winningTeam} (${winningOdds})`,
+			losingTeam: `${losingTeam} (${losingOdds})`,
+			odd: winningOdds,
 		}));
 	};
 
 	const betAmount = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setPlacedBet(prev => ({
 			...prev,
-			[e.target.id]: e.target.value,
+			[e.target.id]: e.target.valueAsNumber,
 			estimatedWin: e.target.valueAsNumber * placedBet.odd,
 		}));
 	};
@@ -161,17 +163,26 @@ export default function Placebet() {
 				</Link>
 				<div className={styles.header}>
 					<span className={styles.game}>
-						{gameData?.homeTeam} - {gameData?.awayTeam}
+						{gameData.homeTeam} - {gameData.awayTeam}
 					</span>
-					<span className={styles.date}>{gameData?.startTime}</span>
+					<span className={styles.date}>
+						{gameData.startTime < `${currentTime}`
+							? 'Game In Progress'
+							: convertDate(gameData.startTime)}
+					</span>
 				</div>
 				<div className={styles.odds}>
 					<div
 						className={`${styles.teamOdds} ${
-							placedBet.team === gameData.homeTeam && styles.selected
+							placedBet.winningTeam === gameData.homeTeam && styles.selected
 						}`}
 						onClick={() =>
-							selectedWinningTeam(gameData.homeTeam, gameData.teamOneOdds.odds)
+							selectedWinningTeam(
+								gameData.homeTeam,
+								gameData.teamOneOdds.odds,
+								gameData.awayTeam,
+								gameData.teamTwoOdds.odds,
+							)
 						}
 					>
 						<span>{gameData.homeTeam}</span>
@@ -179,10 +190,15 @@ export default function Placebet() {
 					</div>
 					<div
 						className={`${styles.teamOdds} ${
-							placedBet.team === gameData.awayTeam && styles.selected
+							placedBet.winningTeam === gameData.awayTeam && styles.selected
 						}`}
 						onClick={() =>
-							selectedWinningTeam(gameData.awayTeam, gameData.teamTwoOdds.odds)
+							selectedWinningTeam(
+								gameData.awayTeam,
+								gameData.teamTwoOdds.odds,
+								gameData.homeTeam,
+								gameData.teamOneOdds.odds,
+							)
 						}
 					>
 						<span>{gameData.awayTeam}</span>
@@ -191,7 +207,11 @@ export default function Placebet() {
 				</div>
 				<div className={styles.placeBetContainer}>
 					<span className={styles.titleLabel}>Winner (Incl. Overtime)</span>
-					<span className={styles.winnerLabel}>{placedBet.team}</span>
+					<span className={styles.winnerLabel}>
+						{placedBet.winningTeam === ''
+							? 'Select Team'
+							: placedBet.winningTeam}
+					</span>
 					<span className={styles.oddsLabel}>{placedBet.odd}</span>
 					<div className={styles.placedBet}>
 						<div className={styles.enterAmount}>
@@ -226,13 +246,16 @@ export default function Placebet() {
 						placedBet.betAmount === '' ||
 						placedBet.betAmount === 0 ||
 						placedBet.betAmount > personalInfo.balance ||
-						placedBet.team === ''
+						placedBet.winningTeam === '' ||
+						gameData.startTime < `${currentTime}`
 							? true
 							: false
 					}
 					onClick={submitBet}
 				>
-					Place Bet
+					{gameData.startTime < `${currentTime}`
+						? 'Bets are Closed'
+						: 'Place Bet'}
 				</button>
 			</div>
 		</div>

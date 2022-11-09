@@ -59,3 +59,21 @@
 .moreNews:hover{
   cursor: pointer;
 }
+
+@media screen and (max-width: 1283px) {
+  .container{
+    max-width: 500px;
+    width: 100%;
+    position: unset;
+  }
+
+  .newsTitle {
+    font-size: 18px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .container{
+    max-width: 100%;
+  }
+}

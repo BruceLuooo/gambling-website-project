@@ -9,6 +9,10 @@
   width: 100%;
 }
 
+.tabs {
+  display: none;
+}
+
 .liveGames {
   width: 80%;
 }
@@ -78,7 +82,6 @@
   height: 2px;
   background-color: white;
   transition:240ms;
-
 }
 .notActive {
   transform: translate3d(0%, 0, 0);
@@ -88,11 +91,39 @@
   width: 111px;
 }
 
+@media screen and (max-width: 1283px) {
+
+  .tabs{
+    display: flex;
+    gap: 1rem;
+  }
+
+  .tabs button {
+    width: 10rem;
+    height: 2rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 18px;
+    cursor: pointer;
+  }
+
+  .newsAndGamesContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3rem;
+    width: 80%;
+  }
+}
 
 @media screen and (max-width: 768px) {
 
   .gamesContainer{
     padding: 3rem 1rem;
+  }
+
+  .newsAndGamesContainer {
+    width: 100%;
   }
 
   .layover {
@@ -102,6 +133,11 @@
   .introHook {
     font-size: 20px;
     text-align: unset;
+  }
+
+  .tabs button {
+    width: 6.5rem;
+    font-size: 16px;
   }
 
   .navigation{

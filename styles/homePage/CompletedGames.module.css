@@ -22,11 +22,18 @@
   grid-template-rows: 2rem 2.5rem 3rem ;
 }
 
-.date {
+.dateContainer {
   display: flex;
   align-items: center;
   grid-column: span 3;
+}
+
+.date {
   font-size: 12px;
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .live {
@@ -47,17 +54,29 @@
   display: none;
 }
 
+.nbaLogo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  grid-row: 2/4;
+  grid-column: 1;
+}
+
 .teams {
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 1rem;
   grid-row: 2/4;
-  grid-column: 1/5;
+  grid-column: 2/5;
 }
 
 .fontSize {
   font-size: 14px;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .scoreContainer {
@@ -65,6 +84,7 @@
   gap: 0.5rem;
   grid-row: 2/5;
   grid-column: 6/11;
+  width: 100%;
 }
 
 .teamPoints {
@@ -72,9 +92,25 @@
   flex-direction: column;
   gap: 0.5rem;
   justify-content: center;
-  align-items: center;
-  max-width: 800px;
+  align-items: flex-start;
+  padding: 0.5rem;
+  background-color: rgb(45, 43, 43);
+  border: none;
+  border-radius: 6px;
+  transition: 0.3s;
+  width: 50%;
+}
+
+.test{
+  font-size: 14px;
   width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.winner {
+  background-color: green;
 }
 
 @media screen and (max-width: 1283px) {
@@ -116,16 +152,19 @@
     display: none;
   }
   .thinLine.thinLineMiddle {
-    grid-column: 5/13 ;
+    grid-column: 10/13 ;
   }
-
-  .date {
-    grid-column: span 4;
+  .dateContainer {
+    grid-column: span 8;
   }
 
   .scoreContainer {
     grid-row: 4/6;
     grid-column: 1/13;
+  }
+
+  .nbaLogo {
+    display: none;
   }
 
 }

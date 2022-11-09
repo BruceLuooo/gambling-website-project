@@ -24,7 +24,6 @@ interface LiveGame {
 	awayTeam: string;
 	homeTeamScore: number;
 	awayTeamScore: number;
-	startingNow?: string;
 }
 
 export default function Home() {
@@ -32,6 +31,28 @@ export default function Home() {
 
 	const [completedGames, setCompletedGames] = useState<CompletedGame[]>([]);
 	const [liveGames, setLiveGames] = useState<LiveGame[]>([]);
+	const [tabs, setTabs] = useState({
+		bet: true,
+		news: true,
+		liveScore: true,
+	});
+
+	useEffect(() => {
+		if (window.innerWidth < 1283) {
+			setTabs({ bet: true, news: false, liveScore: false });
+		}
+
+		function reportWindowSize() {
+			if (window.innerWidth < 1283) {
+				setTabs({ bet: true, news: false, liveScore: false });
+			} else {
+				setTabs({ bet: true, news: true, liveScore: true });
+			}
+		}
+		window.addEventListener('resize', reportWindowSize);
+		//  Cleanup for componentWillUnmount
+		return () => window.removeEventListener('resize', reportWindowSize);
+	}, []);
 
 	useEffect(() => {
 		let completedGames: CompletedGame[] = [];
@@ -51,13 +72,6 @@ export default function Home() {
 			response.data.forEach((data: any) => {
 				if (data.completed === false) {
 					if (data.scores === null) {
-						liveGames.push({
-							homeTeam: data.home_team,
-							awayTeam: data.away_team,
-							homeTeamScore: 0,
-							awayTeamScore: 0,
-							startingNow: 'Starting',
-						});
 						return;
 					} else {
 						liveGames.push({
@@ -106,9 +120,11 @@ export default function Home() {
 			</Head>
 
 			<main className={styles.mainContainer}>
-				<div className={styles.liveGames}>
-					<LiveGames liveGames={liveGames} />
-				</div>
+				{tabs.liveScore && (
+					<div className={styles.liveGames}>
+						<LiveGames liveGames={liveGames} />
+					</div>
+				)}
 				<div className={styles.introduction}>
 					<span className={styles.introHeader}>
 						Basketball Betting Simplified
@@ -118,36 +134,62 @@ export default function Home() {
 						odds and make big profits from the games you bet on!
 					</p>
 				</div>
+				<div className={styles.tabs}>
+					<button
+						onClick={() =>
+							setTabs({ bet: true, news: false, liveScore: false })
+						}
+					>
+						Bet
+					</button>
+					<button
+						onClick={() =>
+							setTabs({ bet: false, news: true, liveScore: false })
+						}
+					>
+						News
+					</button>
+					<button
+						onClick={() =>
+							setTabs({ bet: false, news: false, liveScore: true })
+						}
+					>
+						Live Score
+					</button>
+				</div>
 				<div className={styles.newsAndGamesContainer}>
-					<div className={styles.gamesContainer}>
-						<div className={styles.layover}>
-							<div className={styles.navigationContainer}>
-								<div
-									className={`${styles.navigation} `}
-									onClick={() => setGames(true)}
-								>
-									Games
+					{tabs.bet && (
+						<div className={styles.gamesContainer}>
+							<div className={styles.layover}>
+								<div className={styles.navigationContainer}>
+									<div
+										className={`${styles.navigation} `}
+										onClick={() => setGames(true)}
+									>
+										Games
+									</div>
+									<div
+										className={`${styles.navigation} `}
+										onClick={() => setGames(false)}
+									>
+										Completed
+									</div>
+									<span
+										className={`${styles.underline} ${
+											!games ? styles.active : styles.notActive
+										}`}
+									/>
 								</div>
-								<div
-									className={`${styles.navigation} `}
-									onClick={() => setGames(false)}
-								>
-									Completed
-								</div>
-								<span
-									className={`${styles.underline} ${
-										!games ? styles.active : styles.notActive
-									}`}
-								/>
 							</div>
+
+							{games === true ? (
+								<UpcomingGames />
+							) : (
+								<CompletedGames completedGames={completedGames} />
+							)}
 						</div>
-						{games === true ? (
-							<UpcomingGames />
-						) : (
-							<CompletedGames completedGames={completedGames} />
-						)}
-					</div>
-					<News />
+					)}
+					{tabs.news && <News />}
 				</div>
 			</main>
 		</div>

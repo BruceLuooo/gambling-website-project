@@ -29,14 +29,14 @@ export default function UpcomingGames() {
 		<div>
 			{upcomingGames.map((game, index) => (
 				<div className={styles.displayGameGridContainer} key={index}>
-					<span
-						className={`${styles.date} ${
-							game.startTime === 'Live' && styles.live
-						}`}
-					>
-						{game.startTime}
-					</span>
-					<span className={styles.winnerSentence}>Winner (Incl. Overtime)</span>
+					<div className={styles.dateContainer}>
+						<span className={`${styles.date} `}>{game.startTime}</span>
+					</div>
+					<div className={styles.winnerContainer}>
+						<span className={styles.winnerSentence}>
+							Winner (Incl. Overtime)
+						</span>
+					</div>
 					<hr className={`${styles.thinLine} ${styles.thinLineMiddle}`} />
 					<hr className={`${styles.thinLine} ${styles.thinLineEnd}`} />
 					<div className={styles.nbaLogo}>
@@ -52,18 +52,14 @@ export default function UpcomingGames() {
 							className={styles.button}
 							href={{ pathname: '/placebet', query: { id: game.id } }}
 						>
-							<div className={styles.test}>
-								<span className={styles.fontSize}>{game.homeTeam}</span>
-							</div>
+							<span className={styles.test}>{game.homeTeam}</span>
 							<span>{game.teamOneOdds.odds}</span>
 						</Link>
 						<Link
 							className={styles.button}
 							href={{ pathname: '/placebet', query: { id: game.id } }}
 						>
-							<div className={styles.test}>
-								<span className={styles.fontSize}>{game.awayTeam}</span>
-							</div>
+							<span className={styles.test}>{game.awayTeam}</span>
 							<span>{game.teamTwoOdds.odds}</span>
 						</Link>
 					</div>

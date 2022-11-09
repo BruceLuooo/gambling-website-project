@@ -1,7 +1,6 @@
 import styles from '../../styles/homePage/News.module.css';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import Link from 'next/link';
 import Image from 'next/image';
 import espn from '../../public/espn.png';
 import bleacherReport from '../../public/bleacherReport2.png';
@@ -75,10 +74,6 @@ export default function News() {
 						/>
 					</a>
 				))}
-
-			<Link className={styles.moreNews} href='/news'>
-				See More News
-			</Link>
 		</div>
 	);
 }

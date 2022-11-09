@@ -1,6 +1,6 @@
 import styles from '../styles/Login.module.css';
 import { useContext, useState } from 'react';
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { useRouter } from 'next/router';
 import { auth, db } from '../firebase.config';

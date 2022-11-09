@@ -22,25 +22,34 @@
   grid-template-rows: 2rem 2.5rem 3rem ;
 }
 
-.date {
+.dateContainer{
   display: flex;
   align-items: center;
   grid-column: span 3;
+}
+
+.date {
   font-size: 12px;
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.live {
-  color: rgb(208, 10, 10);
-  font-size: 16px;
-}
-
-.winnerSentence {
+.winnerContainer {
   grid-row: 1;
   grid-column: 7/10;
   display: flex;
   justify-self: center;
   align-items: center;
+}
+
+.winnerSentence {
   font-size: 12px;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .dash {
@@ -66,6 +75,10 @@
 
 .fontSize {
   font-size: 14px;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .buttonContainer {
@@ -73,6 +86,7 @@
   gap: 0.5rem;
   grid-row: 2/5;
   grid-column: 6/11;
+  width: 100%;
 }
 
 .button {
@@ -81,18 +95,26 @@
   gap: 0.5rem;
   justify-content: center;
   align-items: flex-start;
-  padding-left: 0.5rem;
-  max-width: 1000px;
-  width: 100%;
+  padding: 0.5rem;
   background-color: rgb(45, 43, 43);
   border: none;
   border-radius: 6px;
   transition: 0.3s;
+  width: 50%;
 }
 
 .button:hover{
   cursor: pointer;
   background-color: rgb(79, 76, 76);
+}
+
+
+.test {
+  font-size: 14px;
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 @media screen and (max-width: 1283px) {
@@ -123,11 +145,9 @@
     display: contents;
   }
 
-  .winnerSentence {
+  .winnerContainer {
     grid-row: 3;
     grid-column: 4/10;
-    display: flex;
-    align-items: center;
     font-size: 10px;
   }
 
@@ -135,11 +155,11 @@
     display: none;
   }
   .thinLine.thinLineMiddle {
-    grid-column: 5/13 ;
+    grid-column: 8/13 ;
   }
 
-  .date {
-    grid-column: span 4;
+  .dateContainer{
+    grid-column: span 7;
   }
 
   .buttonContainer {
@@ -147,4 +167,7 @@
     grid-column: 1/13;
   }
 
+  .nbaLogo {
+    display: none;
+  }
 }

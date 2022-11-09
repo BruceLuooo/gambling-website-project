@@ -24,7 +24,7 @@
 }
 
 .line {
-  width: 150px;
+  width: 180px;
   opacity: 50%;
 }
 
@@ -34,6 +34,16 @@
   padding: 0 1.5rem;
 }
 
-/* @media screen and (max-width: 768px) {
+.red{
+  color: red;
+}
+.green{
+  color: green
+}
 
-} */
+@media screen and (max-width: 768px) {
+  .line {
+    width: 50px;
+    opacity: 50%;
+  }
+}

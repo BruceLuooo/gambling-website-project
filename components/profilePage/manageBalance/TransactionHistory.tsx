@@ -22,15 +22,22 @@ export default function TransactionHistory({ transactionHistory }: Props) {
 			<span className={styles.transactionHistoryLabel}>
 				Transaction History
 			</span>
-			{transactionHistory.map(transaction => (
-				<div className={styles.transactionContainer}>
+			{transactionHistory.map((transaction, index) => (
+				<div className={styles.transactionContainer} key={index}>
 					<div className={styles.dateLabel}>
 						<span>{transaction.date}</span>
 						<hr className={styles.line} />
 					</div>
 					<div className={styles.transaction}>
 						<span>{transaction.type}</span>
-						<span>{formatter.format(transaction.amount)}</span>
+						<span
+							className={`${
+								transaction.type === 'Deposit' ? styles.green : styles.red
+							}`}
+						>
+							{transaction.type === 'Deposit' ? '+' : '-'}
+							{formatter.format(transaction.amount)}
+						</span>
 					</div>
 				</div>
 			))}

@@ -37,9 +37,6 @@ export default function Navbar() {
 				<span>BetScore</span>
 			</Link>
 			<div className={`${styles.navbar} ${openMenu && styles.open}`}>
-				<Link href='/news' className={styles.navigation}>
-					News
-				</Link>
 				<Link href='/login' className={styles.navigation}>
 					Login
 				</Link>

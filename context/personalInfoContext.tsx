@@ -45,7 +45,7 @@ export const PersonalInfoProvider = ({ children }: Props) => {
 				});
 			}
 		});
-	});
+	}, []);
 
 	const removeFromBalance = async (amount: number) => {
 		const newBalance = personalInfo.balance - amount;
