@@ -1,11 +1,12 @@
 import Head from 'next/head';
 import styles from '../styles/homePage/Home.module.css';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import UpcomingGames from '../components/homePage/UpcomingGames';
 import CompletedGames from '../components/homePage/CompletedGames';
 import News from '../components/homePage/News';
 import axios from 'axios';
 import LiveGames from '../components/homePage/LiveGames';
+import { GetGamesContext } from '../context/GetGamesContext';
 
 interface CompletedGame {
 	id: string;
@@ -26,10 +27,15 @@ interface LiveGame {
 	awayTeamScore: number;
 }
 
+interface GameContext {
+	setCompletedGames: Function;
+}
+
 export default function Home() {
 	const [games, setGames] = useState(true);
+	const { setCompletedGames } = useContext(GetGamesContext) as GameContext;
 
-	const [completedGames, setCompletedGames] = useState<CompletedGame[]>([]);
+	// const [completedGames, setCompletedGames] = useState<CompletedGame[]>([]);
 	const [liveGames, setLiveGames] = useState<LiveGame[]>([]);
 	const [tabs, setTabs] = useState({
 		bet: true,
@@ -74,13 +80,12 @@ export default function Home() {
 					if (data.scores === null) {
 						return;
 					} else {
-						liveGames.push({
+						return liveGames.push({
 							homeTeam: data.home_team,
 							awayTeam: data.away_team,
 							homeTeamScore: data.scores[0].score,
 							awayTeamScore: data.scores[1].score,
 						});
-						return;
 					}
 				}
 
@@ -185,7 +190,8 @@ export default function Home() {
 							{games === true ? (
 								<UpcomingGames />
 							) : (
-								<CompletedGames completedGames={completedGames} />
+								<CompletedGames />
+								// <CompletedGames completedGames={completedGames} />
 							)}
 						</div>
 					)}

@@ -12,6 +12,7 @@ import {
 import { auth, db } from '../../firebase.config';
 import useDelay from '../../hooks/useDelay';
 import Link from 'next/link';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 interface Info {
 	name: string;
@@ -73,9 +74,8 @@ export default function deposit() {
 	if (loading) {
 		return (
 			<div className={styles.mainContainer}>
-				<div className={styles.informationContainer}>
-					<span>loading...</span>
-				</div>
+				<LoadingSpinner />
+				<span>Please wait while we process the information</span>
 			</div>
 		);
 	}
@@ -135,7 +135,6 @@ export default function deposit() {
 							id='cardNumber'
 							type='tel'
 							required
-							pattern='[0-9] {4}'
 							maxLength={16}
 							minLength={16}
 						/>
@@ -143,13 +142,7 @@ export default function deposit() {
 					<div className={styles.layoutBottom}>
 						<div className={`${styles.layout}`}>
 							<label htmlFor='cvv'>cvv</label>
-							<input
-								id='cvv'
-								type='tel'
-								pattern='[0-9] {3}'
-								maxLength={3}
-								minLength={3}
-							/>
+							<input id='cvv' type='tel' maxLength={3} minLength={3} />
 						</div>
 						<div className={`${styles.layout}`}>
 							<label htmlFor='expirationDate'>Exp. Date</label>
@@ -158,7 +151,6 @@ export default function deposit() {
 									id='expirationDate'
 									placeholder='MM'
 									type='tel'
-									pattern='[0-9] {3}'
 									maxLength={2}
 									minLength={2}
 								/>
@@ -166,7 +158,6 @@ export default function deposit() {
 									id='expirationDate'
 									placeholder='YY'
 									type='tel'
-									pattern='[0-9] {3}'
 									maxLength={2}
 									minLength={2}
 								/>

@@ -1,23 +1,65 @@
 import styles from '../../styles/profilePage/ProfileHome.module.css';
 import DisplayBets from '../../components/profilePage/bets/DisplayBets';
 import { PersonalInfoContext } from '../../context/personalInfoContext';
+import { GetGamesContext } from '../../context/GetGamesContext';
 import { useContext, useEffect, useState } from 'react';
-import { collection, getDocs, limit, orderBy, query } from 'firebase/firestore';
+import {
+	collection,
+	getDocs,
+	limit,
+	orderBy,
+	query,
+	doc,
+	setDoc,
+	deleteDoc,
+	updateDoc,
+	serverTimestamp,
+} from 'firebase/firestore';
 import { auth, db } from '../../firebase.config';
 import Link from 'next/link';
 import TransactionHistory from '../../components/profilePage/manageBalance/TransactionHistory';
 
-interface Context {
+interface PersonalInfo {
 	personalInfo: {
 		name: string;
 		balance: number;
 	};
+	setPersonalInfo: Function;
+}
+
+interface CompletedGame {
+	id: string;
+	homeTeam: string;
+	awayTeam: string;
+	homeTeamScore: {
+		score: string;
+	};
+	awayTeamScore: {
+		score: string;
+	};
+	date: string;
+}
+
+interface CompletedGamesInfo {
+	completedGames: CompletedGame[];
 }
 
 interface Transaction {
 	date: string;
 	amount: number;
 	type: string;
+}
+
+interface BetHistory {
+	betAmount: number;
+	estimatedWin: number;
+	winningTeam: string;
+	losingTeam: string;
+	awayTeam: string;
+	awayTeamScore: string;
+	homeTeam: string;
+	homeTeamScore: string;
+	winner: string;
 }
 
 interface ActiveBets {
@@ -28,7 +70,10 @@ interface ActiveBets {
 }
 
 export default function ProfileHome() {
-	const { personalInfo } = useContext(PersonalInfoContext) as Context;
+	const { personalInfo, setPersonalInfo } = useContext(
+		PersonalInfoContext,
+	) as PersonalInfo;
+	const { completedGames } = useContext(GetGamesContext) as CompletedGamesInfo;
 	const convertDate = (timeStamp: Date) => {
 		let date = new Date(timeStamp);
 		return `${date.toDateString()} ${date.toLocaleTimeString()}`;
@@ -37,13 +82,6 @@ export default function ProfileHome() {
 		style: 'currency',
 		currency: 'USD',
 	});
-
-	const [display, setDisplay] = useState({ bets: true, funds: true });
-	const [activeOrHistory, setActiveOrHistory] = useState(true);
-	const [transactionHistory, setTransactionHistory] = useState<Transaction[]>(
-		[],
-	);
-	const [activeBets, setActiveBets] = useState<ActiveBets[]>([]);
 
 	useEffect(() => {
 		if (window.innerWidth < 1283) {
@@ -91,9 +129,44 @@ export default function ProfileHome() {
 		};
 		getTransactionHistory();
 	}, []);
+	useEffect(() => {
+		const getBettingHistory = async () => {
+			const getCollection = collection(
+				db,
+				'users',
+				`${auth.currentUser?.uid}`,
+				'betHistory',
+			);
+
+			const q = query(getCollection, orderBy('date', 'desc'));
+
+			const betHistoryLogRef: BetHistory[] = [];
+
+			const docSnap = await getDocs(q);
+			docSnap.forEach(doc => {
+				return betHistoryLogRef.push({
+					awayTeam: doc.data().awayTeam,
+					awayTeamScore: doc.data().awayTeamScore,
+					betAmount: doc.data().betAmount,
+					estimatedWin: doc.data().estimatedWin,
+					homeTeam: doc.data().homeTeam,
+					homeTeamScore: doc.data().homeTeamScore,
+					losingTeam: doc.data().losingTeam,
+					winningTeam: doc.data().winningTeam,
+					winner: doc.data().winner,
+				});
+			});
+
+			setBetHistory(betHistoryLogRef);
+		};
+
+		getBettingHistory();
+	}, []);
 
 	useEffect(() => {
 		const getActiveBets = async () => {
+			const activeBetsLogRef: ActiveBets[] = [];
+
 			const getCollection = collection(
 				db,
 				'users',
@@ -101,22 +174,81 @@ export default function ProfileHome() {
 				'placedbets',
 			);
 
-			const activeBetsLogRef: ActiveBets[] = [];
-
 			const docSnap = await getDocs(getCollection);
-			docSnap.forEach(doc => {
-				return activeBetsLogRef.push({
-					winningTeam: doc.data().winningTeam,
-					losingTeam: doc.data().losingTeam,
-					betAmount: doc.data().betAmount,
-					payout: doc.data().estimatedWin,
-				});
-			});
+			docSnap.forEach(async document => {
+				const match = completedGames.filter(
+					game => game.id === document.data().id,
+				);
 
+				if (match.length === 1) {
+					const data = {
+						betAmount: document.data().betAmount,
+						estimatedWin: document.data().estimatedWin,
+						winningTeam: document.data().winningTeam,
+						losingTeam: document.data().losingTeam,
+						awayTeam: match[0].awayTeam,
+						awayTeamScore: match[0].awayTeamScore.score,
+						homeTeam: match[0].homeTeam,
+						homeTeamScore: match[0].homeTeamScore.score,
+						winner:
+							match[0].awayTeamScore.score > match[0].homeTeamScore.score
+								? match[0].awayTeam
+								: match[0].homeTeam,
+						date: serverTimestamp(),
+					};
+					betHistory.push(data);
+
+					const betWon = data.winningTeam
+						.toLowerCase()
+						.includes(data.winner.toLowerCase());
+
+					if (betWon) {
+						const currentUser = doc(db, 'users', `${auth.currentUser!.uid}`);
+						await updateDoc(currentUser, {
+							balance: personalInfo.balance + data.estimatedWin,
+						});
+
+						//@ts-ignore
+						setPersonalInfo(prev => ({
+							...prev,
+							balance: personalInfo.balance + data.estimatedWin,
+						}));
+					}
+
+					const docRef = doc(
+						db,
+						`users/${auth.currentUser?.uid}/betHistory`,
+						`${document.data().id}`,
+					);
+					await setDoc(docRef, data);
+					await deleteDoc(
+						doc(
+							db,
+							`users/${auth.currentUser?.uid}/placedbets`,
+							`${document.data().id}`,
+						),
+					);
+				} else {
+					return activeBetsLogRef.push({
+						winningTeam: document.data().winningTeam,
+						losingTeam: document.data().losingTeam,
+						betAmount: document.data().betAmount,
+						payout: document.data().estimatedWin,
+					});
+				}
+			});
 			setActiveBets(activeBetsLogRef);
 		};
 		getActiveBets();
 	}, []);
+
+	const [display, setDisplay] = useState({ bets: true, funds: true });
+	const [activeOrHistory, setActiveOrHistory] = useState(true);
+	const [transactionHistory, setTransactionHistory] = useState<Transaction[]>(
+		[],
+	);
+	const [activeBets, setActiveBets] = useState<ActiveBets[]>([]);
+	const [betHistory, setBetHistory] = useState<BetHistory[]>([]);
 
 	return (
 		<div className={styles.mainContainer}>
@@ -144,6 +276,7 @@ export default function ProfileHome() {
 						<DisplayBets
 							activeOrHistory={activeOrHistory}
 							activeBets={activeBets}
+							betHistory={betHistory}
 						/>
 					</div>
 				)}

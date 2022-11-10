@@ -1,6 +1,8 @@
 import styles from '../../styles/homePage/CompletedGames.module.css';
 import Image from 'next/image';
 import nbaLogo from '../../public/nbaLogo.png';
+import { GetGamesContext } from '../../context/GetGamesContext';
+import { useContext } from 'react';
 
 interface CompletedGame {
 	id: string;
@@ -19,7 +21,9 @@ type Props = {
 	completedGames: CompletedGame[];
 };
 
-export default function CompletedGames({ completedGames }: Props) {
+export default function CompletedGames() {
+	const { completedGames } = useContext(GetGamesContext) as Props;
+
 	return (
 		<div>
 			{completedGames.map((game, index) => (

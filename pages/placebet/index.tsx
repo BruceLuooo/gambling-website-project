@@ -5,10 +5,11 @@ import React, { useContext, useEffect, useState } from 'react';
 import { GetGamesContext } from '../../context/GetGamesContext';
 import { PersonalInfoContext } from '../../context/personalInfoContext';
 import backArrow from '../../public/backArrow.svg';
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection, doc, setDoc } from 'firebase/firestore';
 import { db, auth } from '../../firebase.config';
 import useDelay from '../../hooks/useDelay';
 import { useRouter } from 'next/router';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 interface getGames {
 	id: string;
@@ -126,11 +127,13 @@ export default function Placebet() {
 		setLoading(true);
 
 		try {
-			const docRef = collection(
+			const docRef = doc(
 				db,
 				`/users/${auth.currentUser!.uid}/placedbets`,
+				`${placedBet.id}`,
 			);
-			await addDoc(docRef, placedBet);
+
+			await setDoc(docRef, placedBet);
 
 			removeFromBalance(placedBet.betAmount);
 			await delay(3000);
@@ -143,9 +146,8 @@ export default function Placebet() {
 	if (loading) {
 		return (
 			<div className={styles.mainContainer}>
-				<div className={styles.bettingContainer}>
-					<span>loading...</span>
-				</div>
+				<LoadingSpinner />
+				<span>Please wait while we process the information</span>
 			</div>
 		);
 	}
@@ -185,7 +187,7 @@ export default function Placebet() {
 							)
 						}
 					>
-						<span>{gameData.homeTeam}</span>
+						<span className={styles.overflow}>{gameData.homeTeam}</span>
 						<span>{gameData.teamOneOdds.odds}</span>
 					</div>
 					<div
@@ -201,7 +203,7 @@ export default function Placebet() {
 							)
 						}
 					>
-						<span>{gameData.awayTeam}</span>
+						<span className={styles.overflow}>{gameData.awayTeam}</span>
 						<span>{gameData.teamTwoOdds.odds}</span>
 					</div>
 				</div>

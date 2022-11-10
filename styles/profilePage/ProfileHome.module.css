@@ -58,6 +58,10 @@
   flex-direction: column;
 }
 
+.manageBalance span:nth-child(1) {
+  font-size: 20px;
+}
+
 .balance {
   font-size: 40px;
   margin-left: 2rem;
@@ -152,5 +156,9 @@
 
   .balance {
     margin-left: unset;
+  }
+
+  .betsContainer {
+    padding: 1rem;
   }
 }

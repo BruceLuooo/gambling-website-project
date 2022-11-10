@@ -4,6 +4,7 @@ import axios from 'axios';
 import Image from 'next/image';
 import espn from '../../public/espn.png';
 import bleacherReport from '../../public/bleacherReport2.png';
+import LoadingSpinner from '../LoadingSpinner';
 
 interface News {
 	title: string;
@@ -14,7 +15,7 @@ interface News {
 export default function News() {
 	const [news, setNews] = useState<News[]>([]);
 	const [newsReporter, setNewsReporter] = useState<string>('espn');
-	const [loading, setLoading] = useState<boolean>(false);
+	const [loading, setLoading] = useState<boolean>(true);
 
 	useEffect(() => {
 		const options = {
@@ -42,8 +43,12 @@ export default function News() {
 	}, [newsReporter]);
 
 	const changeNewsReporter = (reporter: string) => {
-		setLoading(true);
-		setNewsReporter(reporter);
+		if (newsReporter === reporter) {
+			return;
+		} else {
+			setLoading(true);
+			setNewsReporter(reporter);
+		}
 	};
 
 	return (
@@ -63,9 +68,14 @@ export default function News() {
 					Bleacher Report
 				</button>
 			</div>
-			{!loading &&
+			{!loading ? (
 				news.map(data => (
-					<a target='_blank' href={data.url} className={styles.news}>
+					<a
+						key={data.title}
+						target='_blank'
+						href={data.url}
+						className={styles.news}
+					>
 						<span className={styles.newsTitle}>{data.title}</span>
 						<Image
 							src={newsReporter === 'espn' ? espn : bleacherReport}
@@ -73,7 +83,10 @@ export default function News() {
 							width={newsReporter === 'espn' ? 50 : 40}
 						/>
 					</a>
-				))}
+				))
+			) : (
+				<LoadingSpinner />
+			)}
 		</div>
 	);
 }

@@ -27,6 +27,7 @@
 .teamsAndScores{
   display: flex;
   justify-content: space-between;
+  gap: 0.5rem;
   align-items: center;
 }
 
@@ -37,7 +38,7 @@
 }
 
 .overflow {
-  max-width: 100px;
+  max-width: 70px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -63,7 +64,7 @@
   }
 
   .noLiveGamesLabel{
-    display: contents;
+    display: flex;
   }
 
   .gameContainer{
@@ -92,5 +93,9 @@
   }
   .container {
     top: 25rem;
+  }
+
+  .noLiveGamesLabel{
+    padding: 2rem;
   }
 }
