@@ -13,6 +13,7 @@ import { auth, db } from '../../firebase.config';
 import useDelay from '../../hooks/useDelay';
 import Link from 'next/link';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import Head from 'next/head';
 
 interface Info {
 	name: string;
@@ -82,6 +83,10 @@ export default function deposit() {
 
 	return (
 		<div className={styles.mainContainer}>
+			<Head>
+				<title>BetScore | Deposit </title>
+			</Head>
+
 			<div className={styles.navigation}>
 				<span>
 					<Link href={'/profile'}>profile</Link>
@@ -96,7 +101,11 @@ export default function deposit() {
 						<hr className={styles.underline} />
 					</div>
 					<span className={styles.balance}>
-						{formatter.format(personalInfo.balance)}
+						{personalInfo.balance === 0 ? (
+							<LoadingSpinner />
+						) : (
+							formatter.format(personalInfo.balance)
+						)}
 					</span>
 					<div className={`${styles.layout}`}>
 						<label htmlFor='amount'>Deposit Amount</label>

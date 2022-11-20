@@ -1,7 +1,6 @@
 import { createContext, ReactNode, useEffect, useState } from 'react';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase.config';
-
 interface Info {
 	name: string;
 	lastname: string;

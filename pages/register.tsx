@@ -57,7 +57,7 @@ const Register = () => {
 			);
 			const user = userCredential.user;
 			const token = await user.getIdToken();
-			localStorage.setItem('token', token);
+			sessionStorage.setItem('token', token);
 
 			await setDoc(doc(db, 'users', user.uid), registerInfo);
 			return router.push('/');

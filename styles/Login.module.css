@@ -1,9 +1,10 @@
 .container{
   display: flex;
 	flex-direction: column;
-	width: 30rem;
+	max-width: 30rem;
+	width: 100%;
 	margin: auto;
-	margin-top: 10rem;
+	margin-top: 6rem;
 	padding: 5rem;
 	gap: 2rem;
 	border: 1px solid lightgray;
@@ -63,3 +64,11 @@
   background-color: #4f8efb;
 }
 
+@media screen and (max-width: 768px) {
+	.container{
+		margin-top: 4rem;
+		padding: 2rem;
+		gap: 2rem;
+		border: none;
+	}
+}

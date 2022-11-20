@@ -1,6 +1,7 @@
 .container {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding: 1rem 4rem;
   position: relative;
 }
@@ -19,6 +20,8 @@
 }
 
 .navigation {
+  border: none;
+  background-color: black;
   font-size: 22px;
   color: white;
   transition: 0.3s;
@@ -26,10 +29,10 @@
 
 .navigation:hover {
   color: rgba(245, 245, 245, 0.488);
+  cursor: pointer;
 }
 
 .menuButton {
-  background-color: grey;
   display: none;
 }
 
@@ -67,8 +70,8 @@
     opacity: 100%;
     padding-top: 5rem;
     transform: translate(-50%, 5%);
-    height: 92vh;
-    background-color: grey;
+    height: 100vh;
+    background-color: black;
     pointer-events: fill;
   }
   .navigation {

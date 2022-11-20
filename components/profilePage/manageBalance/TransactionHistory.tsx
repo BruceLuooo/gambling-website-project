@@ -20,7 +20,7 @@ export default function TransactionHistory({ transactionHistory }: Props) {
 	return (
 		<div className={styles.container}>
 			<span className={styles.transactionHistoryLabel}>
-				Transaction History
+				Recent Transaction History
 			</span>
 			{transactionHistory.map((transaction, index) => (
 				<div className={styles.transactionContainer} key={index}>

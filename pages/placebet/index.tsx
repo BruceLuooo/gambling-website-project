@@ -4,12 +4,13 @@ import Image from 'next/image';
 import React, { useContext, useEffect, useState } from 'react';
 import { GetGamesContext } from '../../context/GetGamesContext';
 import { PersonalInfoContext } from '../../context/personalInfoContext';
-import backArrow from '../../public/backArrow.svg';
+import backArrow from '../../public/backArrow.png';
 import { addDoc, collection, doc, setDoc } from 'firebase/firestore';
 import { db, auth } from '../../firebase.config';
 import useDelay from '../../hooks/useDelay';
 import { useRouter } from 'next/router';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import Head from 'next/head';
 
 interface getGames {
 	id: string;
@@ -56,16 +57,33 @@ export default function Placebet() {
 	const { delay, loading, setLoading } = useDelay();
 	const router = useRouter();
 
-	const currentTime = new Date();
-	const convertDate = (timeStamp: string) => {
-		let date = new Date(timeStamp);
-		return `${date.toDateString()} ${date.toLocaleTimeString()}`;
-	};
+	const timeStamp = new Date();
+	// const date = timeStamp.toLocaleDateString('en-US', {
+	// 	weekday: 'long',
+	// 	month: 'long',
+	// 	day: 'numeric',
+	// 	hour: 'numeric',
+	// 	minute: 'numeric',
+	// });
 
 	const formatter = new Intl.NumberFormat('en-US', {
 		style: 'currency',
 		currency: 'USD',
 	});
+
+	useEffect(() => {
+		const queryString = window.location.search;
+		const urlParams = new URLSearchParams(queryString);
+		const id = urlParams.get('id');
+		const find = upcomingGames.find(data => data.id === id);
+		if (find) {
+			setGameData(find);
+			setPlacedBet(prev => ({
+				...prev,
+				id: find.id,
+			}));
+		}
+	}, [upcomingGames]);
 
 	const [gameData, setGameData] = useState<getGames>({
 		id: '',
@@ -86,20 +104,6 @@ export default function Placebet() {
 		betAmount: 0,
 		estimatedWin: 0,
 	});
-
-	useEffect(() => {
-		const queryString = window.location.search;
-		const urlParams = new URLSearchParams(queryString);
-		const id = urlParams.get('id');
-		const find = upcomingGames.find(data => data.id === id);
-		if (find) {
-			setGameData(find);
-			setPlacedBet(prev => ({
-				...prev,
-				id: find.id,
-			}));
-		}
-	}, [upcomingGames]);
 
 	const selectedWinningTeam = (
 		winningTeam: string,
@@ -154,12 +158,18 @@ export default function Placebet() {
 
 	return (
 		<div className={styles.mainContainer}>
+			<Head>
+				<title>
+					{gameData.homeTeam} - {gameData.awayTeam}
+				</title>
+			</Head>
+
 			<div className={styles.bettingContainer}>
 				<Link href='/'>
 					<Image
 						src={backArrow}
 						alt={'goBack'}
-						width={50}
+						width={16}
 						className={styles.backArrow}
 					/>
 				</Link>
@@ -167,11 +177,7 @@ export default function Placebet() {
 					<span className={styles.game}>
 						{gameData.homeTeam} - {gameData.awayTeam}
 					</span>
-					<span className={styles.date}>
-						{gameData.startTime < `${currentTime}`
-							? 'Game In Progress'
-							: convertDate(gameData.startTime)}
-					</span>
+					<span className={styles.date}>{gameData.startTime}</span>
 				</div>
 				<div className={styles.odds}>
 					<div
@@ -248,16 +254,11 @@ export default function Placebet() {
 						placedBet.betAmount === '' ||
 						placedBet.betAmount === 0 ||
 						placedBet.betAmount > personalInfo.balance ||
-						placedBet.winningTeam === '' ||
-						gameData.startTime < `${currentTime}`
-							? true
-							: false
+						placedBet.winningTeam === ''
 					}
 					onClick={submitBet}
 				>
-					{gameData.startTime < `${currentTime}`
-						? 'Bets are Closed'
-						: 'Place Bet'}
+					{personalInfo.name === '' ? 'Login To Place Bet' : 'Place Bet'}
 				</button>
 			</div>
 		</div>

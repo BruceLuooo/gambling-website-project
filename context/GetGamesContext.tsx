@@ -53,10 +53,10 @@ export const GetGamesProvider = ({ children }: Props) => {
 				regions: 'us',
 				oddsFormat: 'decimal',
 				markets: 'h2h',
-				dateFormat: 'iso',
+				dateFormat: 'unix',
 			},
 			headers: {
-				'X-RapidAPI-Key': '2cbb011960msh3ff72f4f58249a1p127b8bjsnc63ffc1d70d9',
+				'X-RapidAPI-Key': `2cbb011960msh3ff72f4f58249a1p127b8bjsnc63ffc1d70d9`,
 				'X-RapidAPI-Host': 'odds.p.rapidapi.com',
 			},
 		};
@@ -64,15 +64,21 @@ export const GetGamesProvider = ({ children }: Props) => {
 			response.data.forEach((data: any) => {
 				if (data.bookmakers[0] === undefined) return;
 
-				const date = new Date(data.commence_time);
-				const timeStamp = date.getTime();
-				const dateCopy = `${new Date(timeStamp)}`;
+				const milliseconds = data.commence_time * 1000;
+				const timeStamp = new Date(milliseconds);
+				const date = timeStamp.toLocaleDateString('en-US', {
+					weekday: 'long',
+					month: 'long',
+					day: 'numeric',
+					hour: 'numeric',
+					minute: 'numeric',
+				});
 
 				information.push({
 					id: data.id,
 					homeTeam: data.home_team,
 					awayTeam: data.away_team,
-					startTime: dateCopy,
+					startTime: date,
 					teamOneOdds: {
 						odds:
 							data.bookmakers[0].markets[0].outcomes[0].name === data.home_team

@@ -1,6 +1,10 @@
 import styles from '../styles/Login.module.css';
 import { useContext, useState } from 'react';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import {
+	browserSessionPersistence,
+	setPersistence,
+	signInWithEmailAndPassword,
+} from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { useRouter } from 'next/router';
 import { auth, db } from '../firebase.config';
@@ -40,34 +44,36 @@ const Login = () => {
 			return setError({ active: true, message: 'Please fill in all fields' });
 		}
 
-		try {
-			const { user } = await signInWithEmailAndPassword(
-				auth,
-				loginInfo.email,
-				loginInfo.password,
-			);
+		setPersistence(auth, browserSessionPersistence).then(async () => {
+			try {
+				const { user } = await signInWithEmailAndPassword(
+					auth,
+					loginInfo.email,
+					loginInfo.password,
+				);
 
-			if (user) {
-				setError({ active: false, message: '' });
+				if (user) {
+					setError({ active: false, message: '' });
 
-				const token = await user.getIdToken();
-				localStorage.setItem('token', token);
+					const token = await user.getIdToken();
+					sessionStorage.setItem('token', token);
 
-				const docRef = doc(db, 'users', `${auth.currentUser!.uid}`);
-				const docSnap = await getDoc(docRef);
-				setPersonalInfo({
-					name: docSnap.data()!.name,
-					lastname: docSnap.data()!.lastname,
-					email: docSnap.data()!.email,
-					balance: docSnap.data()!.balance,
-				});
+					const docRef = doc(db, 'users', `${auth.currentUser!.uid}`);
+					const docSnap = await getDoc(docRef);
+					setPersonalInfo({
+						name: docSnap.data()!.name,
+						lastname: docSnap.data()!.lastname,
+						email: docSnap.data()!.email,
+						balance: docSnap.data()!.balance,
+					});
 
-				router.push('/');
+					router.push('/');
+				}
+			} catch (error) {
+				console.log(error);
+				return setError({ active: true, message: 'Invalid Email/Password' });
 			}
-		} catch (error) {
-			console.log(error);
-			return setError({ active: true, message: 'Invalid Email/Password' });
-		}
+		});
 	};
 
 	return (
