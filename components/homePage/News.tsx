@@ -22,7 +22,7 @@ export default function News() {
 			method: 'GET',
 			url: `https://nba-latest-news.p.rapidapi.com/news/source/${newsReporter}`,
 			headers: {
-				'X-RapidAPI-Key': '2cbb011960msh3ff72f4f58249a1p127b8bjsnc63ffc1d70d9',
+				'X-RapidAPI-Key': '64c42d5081msh77e5f10405df956p13fbfbjsnbbeae69c6b06',
 				'X-RapidAPI-Host': 'nba-latest-news.p.rapidapi.com',
 			},
 		};
@@ -73,6 +73,7 @@ export default function News() {
 					<a
 						key={data.title}
 						target='_blank'
+						rel='noreferrer'
 						href={data.url}
 						className={styles.news}
 					>

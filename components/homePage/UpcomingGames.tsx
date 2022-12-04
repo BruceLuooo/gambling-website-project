@@ -1,7 +1,6 @@
 import styles from '../../styles/homePage/UpcomingGames.module.css';
 import Link from 'next/link';
 import React, { useContext } from 'react';
-import { GetGamesContext } from '../../context/GetGamesContext';
 import Image from 'next/image';
 import nbaLogo from '../../public/nbaLogo.png';
 
@@ -18,13 +17,11 @@ interface getGames {
 	};
 }
 
-type GamesContext = {
+type Props = {
 	upcomingGames: getGames[];
 };
 
-export default function UpcomingGames() {
-	const { upcomingGames } = useContext(GetGamesContext) as GamesContext;
-
+export default function UpcomingGames({ upcomingGames }: Props) {
 	return (
 		<div>
 			{upcomingGames.map((game, index) => (

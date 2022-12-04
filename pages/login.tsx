@@ -9,11 +9,9 @@ import { doc, getDoc } from 'firebase/firestore';
 import { useRouter } from 'next/router';
 import { auth, db } from '../firebase.config';
 import { PersonalInfoContext } from '../context/personalInfoContext';
-
-interface login {
-	email: string;
-	password: string;
-}
+import { useLogin } from '../hooks/loginAndRegister/useLogin';
+import Head from 'next/head';
+import Link from 'next/link';
 
 type InfoContext = {
 	setPersonalInfo: Function;
@@ -23,24 +21,14 @@ const Login = () => {
 	const router = useRouter();
 
 	const { setPersonalInfo } = useContext(PersonalInfoContext) as InfoContext;
+	const { updateLoginInfo, formIsCompleted, loginInfo } = useLogin();
 
-	const [loginInfo, setLoginInfo] = useState<login>({
-		email: '',
-		password: '',
-	});
 	const [error, setError] = useState({ active: false, message: '' });
-
-	const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setLoginInfo(prev => ({
-			...prev,
-			[e.target.id]: e.target.value,
-		}));
-	};
 
 	const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
-		if (loginInfo.email === '' || loginInfo.password === '') {
+		if (formIsCompleted(loginInfo)) {
 			return setError({ active: true, message: 'Please fill in all fields' });
 		}
 
@@ -70,7 +58,6 @@ const Login = () => {
 					router.push('/');
 				}
 			} catch (error) {
-				console.log(error);
 				return setError({ active: true, message: 'Invalid Email/Password' });
 			}
 		});
@@ -78,6 +65,10 @@ const Login = () => {
 
 	return (
 		<div className={styles.container}>
+			<Head>
+				<title>NBetsA | Login</title>
+				<link rel='icon' type='image/x-icon' href='/static/favicon.ico' />
+			</Head>
 			<span className={styles.logoFont}>Sign Into Your Account</span>
 			<form className={styles.formContainer} onSubmit={onSubmit}>
 				<div className={styles.input}>
@@ -88,7 +79,7 @@ const Login = () => {
 						className={styles.inputBox}
 						id='email'
 						type='text'
-						onChange={onChange}
+						onChange={updateLoginInfo}
 					/>
 				</div>
 				<div className={styles.input}>
@@ -99,7 +90,7 @@ const Login = () => {
 						className={styles.inputBox}
 						id='password'
 						type='password'
-						onChange={onChange}
+						onChange={updateLoginInfo}
 					/>
 				</div>
 				<div className={styles.invalidLogin}>
@@ -112,7 +103,7 @@ const Login = () => {
 				</div>
 			</form>
 			<span>
-				Don't have an account? Register <a href='/register'>Here</a>
+				Don&apos;t have an account? Register <Link href='/register'>Here</Link>
 			</span>
 		</div>
 	);

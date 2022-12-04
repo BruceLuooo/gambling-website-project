@@ -3,7 +3,7 @@ import Image from 'next/image';
 import styles from '../styles/navbar.module.css';
 import Link from 'next/link';
 import menu from '../public/hamburger.png';
-import logo from '../public/logo.png';
+import logo from '../public/logo4.png';
 import { auth, db } from '../firebase.config';
 import { useRouter } from 'next/router';
 import { PersonalInfoContext } from '../context/personalInfoContext';
@@ -46,6 +46,7 @@ export default function Navbar() {
 
 	const logout = () => {
 		auth.signOut();
+		router.push('/');
 		sessionStorage.removeItem('token');
 		setPersonalInfo({
 			name: '',
@@ -53,7 +54,6 @@ export default function Navbar() {
 			email: '',
 			balance: 0,
 		});
-		router.push('/');
 		setOpenMenu(false);
 	};
 
@@ -85,9 +85,13 @@ export default function Navbar() {
 
 	return (
 		<div className={styles.container}>
-			<Link href='/' className={styles.logo}>
-				<Image src={logo} alt={'Logo'} width={80} />
-				<span onClick={() => setOpenMenu(false)}>BetScore</span>
+			<Link href='/'>
+				<Image
+					src={logo}
+					alt={'Logo'}
+					className={styles.logo}
+					onClick={() => setOpenMenu(false)}
+				/>
 			</Link>
 			{token ? (
 				<div className={`${styles.navbar} ${openMenu && styles.open}`}>

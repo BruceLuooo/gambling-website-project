@@ -107,7 +107,14 @@
 .submitButton{
   height: 2rem;
   width: 16.5rem;
+  cursor: pointer;
 }
+
+.error {
+  display: flex;
+  color: red;
+}
+
 
 @media screen and (max-width: 1283px) {
   .headerLabel{

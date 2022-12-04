@@ -16,7 +16,7 @@ interface BetHistory {
 }
 
 export default function BettingHistory() {
-	const formatter = new Intl.NumberFormat('en-US', {
+	const formatCurrency = new Intl.NumberFormat('en-US', {
 		style: 'currency',
 		currency: 'USD',
 	});
@@ -58,7 +58,7 @@ export default function BettingHistory() {
 	}, []);
 
 	return (
-		<div className={styles.bettingHistoryContainer}>
+		<div className={styles.bettingContainer}>
 			{betHistory.map((bet, index) => (
 				<div
 					className={`${styles.placedBetsContainer} ${
@@ -74,11 +74,11 @@ export default function BettingHistory() {
 						<span>{bet.losingTeam}</span>
 					</div>
 					<span className={styles.padding}>
-						Bet: {formatter.format(bet.betAmount)}
+						Bet: {formatCurrency.format(bet.betAmount)}
 					</span>
 					<div className={styles.padding}>
 						<span>Payout: </span>
-						<span>{formatter.format(bet.estimatedWin)}</span>
+						<span>{formatCurrency.format(bet.estimatedWin)}</span>
 					</div>
 					<div>
 						<hr className={styles.lineSeperator} />

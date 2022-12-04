@@ -1,5 +1,5 @@
 import styles from '../../styles/profilePage/DepositorWidthdraw.module.css';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { PersonalInfoContext } from '../../context/personalInfoContext';
 import { useRouter } from 'next/router';
 import {
@@ -14,6 +14,7 @@ import useDelay from '../../hooks/useDelay';
 import Link from 'next/link';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import Head from 'next/head';
+import { useDepositOrWidthdraw } from '../../hooks/profile/useDepositOrWidthdraw';
 
 interface Info {
 	name: string;
@@ -27,24 +28,51 @@ type InfoContext = {
 	setPersonalInfo: Function;
 };
 
-export default function deposit() {
+export default function Deposit() {
 	const router = useRouter();
 	const { delay, loading, setLoading } = useDelay();
+
+	useEffect(() => {
+		auth.onAuthStateChanged(user => {
+			if (!user) {
+				return router.push('/');
+			} else {
+				return setIsLoading(false);
+			}
+		});
+	}, [router]);
+
+	const {
+		bankDetails,
+		setBankDetails,
+		updateBankDetails,
+		updateMoneyAmount,
+		isFormCompletetd,
+		updateCvv,
+		updateExpDate,
+		updateCardNumber,
+	} = useDepositOrWidthdraw();
+	const { amount, cardNumber, cvv, expMonth, expYear } = bankDetails;
+
 	const { personalInfo, setPersonalInfo } = useContext(
 		PersonalInfoContext,
 	) as InfoContext;
-	const [amount, setAmount] = useState<number>();
+
+	const [isLoading, setIsLoading] = useState(true);
+	const [error, setError] = useState({ error: false, msg: '' });
 
 	const formatter = new Intl.NumberFormat('en-US', {
 		style: 'currency',
 		currency: 'USD',
 	});
 
-	const setDepositAmount = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setAmount(e.target.valueAsNumber);
-	};
+	const deposit = async (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
 
-	const deposit = async () => {
+		if (isFormCompletetd(bankDetails)) {
+			return setError({ error: true, msg: 'Please Check Information' });
+		}
+
 		setLoading(true);
 
 		const docRef = doc(db, 'users', `${auth.currentUser!.uid}`);
@@ -81,54 +109,67 @@ export default function deposit() {
 		);
 	}
 
+	if (isLoading) {
+		return <LoadingSpinner />;
+	}
+
 	return (
 		<div className={styles.mainContainer}>
 			<Head>
-				<title>BetScore | Deposit </title>
+				<title>NBetsA | Deposit </title>
 			</Head>
 
-			<div className={styles.navigation}>
+			<section className={styles.navigation}>
 				<span>
-					<Link href={'/profile'}>profile</Link>
+					<Link href={'/profile'}>Profile</Link>
 				</span>
 				<span>/</span>
 				<span>Deposit</span>
-			</div>
-			<div className={styles.informationContainer}>
-				<div className={styles.form}>
+			</section>
+			<section className={styles.informationContainer}>
+				<section className={styles.form}>
 					<div>
 						<span className={styles.headerLabel}>Balance</span>
 						<hr className={styles.underline} />
 					</div>
 					<span className={styles.balance}>
-						{personalInfo.balance === 0 ? (
-							<LoadingSpinner />
-						) : (
-							formatter.format(personalInfo.balance)
-						)}
+						{formatter.format(personalInfo.balance)}
 					</span>
 					<div className={`${styles.layout}`}>
 						<label htmlFor='amount'>Deposit Amount</label>
 						<input
 							type='number'
 							placeholder='Enter Amount'
+							//@ts-ignore
 							value={amount}
 							id='amount'
-							onChange={setDepositAmount}
+							onChange={updateMoneyAmount}
+							required
 						/>
 					</div>
 					<div className={styles.buttonContainer}>
-						<button type='button' onClick={() => setAmount(100)}>
+						<button
+							type='button'
+							onClick={() => setBankDetails(prev => ({ ...prev, amount: 100 }))}
+						>
 							$100
 						</button>
-						<button type='button' onClick={() => setAmount(500)}>
+						<button
+							type='button'
+							onClick={() => setBankDetails(prev => ({ ...prev, amount: 500 }))}
+						>
 							$500
 						</button>
-						<button type='button' onClick={() => setAmount(1000)}>
+						<button
+							type='button'
+							onClick={() =>
+								setBankDetails(prev => ({ ...prev, amount: 1000 }))
+							}
+						>
 							$1000
 						</button>
 					</div>
-				</div>
+				</section>
 				<form className={styles.form} onSubmit={deposit}>
 					<div>
 						<span className={styles.headerLabel}>Card Detail</span>
@@ -136,48 +177,62 @@ export default function deposit() {
 					</div>
 					<div className={`${styles.layout}`}>
 						<label htmlFor='name'>Full Name</label>
-						<input id='name' type='text' />
+						<input
+							id='name'
+							type='text'
+							onChange={updateBankDetails}
+							required
+						/>
 					</div>
 					<div className={`${styles.layout}`}>
 						<label htmlFor='cardNumber'>Card Number</label>
 						<input
 							id='cardNumber'
-							type='tel'
+							onChange={updateCardNumber}
+							value={cardNumber}
+							type='text'
 							required
-							maxLength={16}
-							minLength={16}
 						/>
 					</div>
 					<div className={styles.layoutBottom}>
 						<div className={`${styles.layout}`}>
 							<label htmlFor='cvv'>cvv</label>
-							<input id='cvv' type='tel' maxLength={3} minLength={3} />
+							<input
+								id='cvv'
+								onChange={updateCvv}
+								value={cvv}
+								type='number'
+								required
+							/>
 						</div>
 						<div className={`${styles.layout}`}>
 							<label htmlFor='expirationDate'>Exp. Date</label>
 							<div>
 								<input
-									id='expirationDate'
+									id='expMonth'
 									placeholder='MM'
-									type='tel'
-									maxLength={2}
-									minLength={2}
+									onChange={updateExpDate}
+									value={expMonth}
+									type='number'
+									required
 								/>
 								<input
-									id='expirationDate'
+									id='expYear'
 									placeholder='YY'
-									type='tel'
-									maxLength={2}
-									minLength={2}
+									onChange={updateExpDate}
+									value={expYear}
+									type='number'
+									required
 								/>
 							</div>
 						</div>
 					</div>
+					{error.error && <div className={styles.error}>{error.msg}</div>}
 					<button className={styles.submitButton} type='submit'>
 						Deposit
 					</button>
 				</form>
-			</div>
+			</section>
 		</div>
 	);
 }

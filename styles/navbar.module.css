@@ -7,10 +7,8 @@
 }
 
 .logo {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 22px;
+  width: 150px;
+  height: 75px;
 }
 
 .navbar {
@@ -40,6 +38,12 @@
 
   .container {
     padding: 1rem 1.5rem;
+  }
+
+  .logo {
+    width: 130px;
+    height: 65px;
+    margin-left: -20px;
   }
 
   .menuButton{

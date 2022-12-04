@@ -10,6 +10,7 @@ import TransactionHistory from '../../components/profilePage/manageBalance/Trans
 import BettingHistory from '../../components/profilePage/bets/BettingHistory';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 interface PersonalInfo {
 	personalInfo: {
@@ -25,10 +26,9 @@ interface Transaction {
 	type: string;
 }
 
-export default function ProfileHome() {
-	const { personalInfo, setPersonalInfo } = useContext(
-		PersonalInfoContext,
-	) as PersonalInfo;
+const ProfileHome = () => {
+	const { personalInfo } = useContext(PersonalInfoContext) as PersonalInfo;
+	const router = useRouter();
 	const convertDate = (timeStamp: Date) => {
 		let date = new Date(timeStamp);
 		return `${date.toDateString()} ${date.toLocaleTimeString()}`;
@@ -39,12 +39,22 @@ export default function ProfileHome() {
 		currency: 'USD',
 	});
 
+	const [isLoading, setIsLoading] = useState(true);
 	const [display, setDisplay] = useState({ bets: true, funds: true });
 	const [activeOrHistory, setActiveOrHistory] = useState(true);
 	const [transactionHistory, setTransactionHistory] = useState<Transaction[]>(
 		[],
 	);
-	const router = useRouter();
+
+	useEffect(() => {
+		auth.onAuthStateChanged(user => {
+			if (!user) {
+				return router.push('/');
+			} else {
+				return setIsLoading(false);
+			}
+		});
+	});
 
 	useEffect(() => {
 		if (window.innerWidth < 1283) {
@@ -98,10 +108,15 @@ export default function ProfileHome() {
 		});
 	}, []);
 
+	if (isLoading) {
+		return <LoadingSpinner />;
+	}
+
 	return (
 		<div className={styles.mainContainer}>
 			<Head>
-				<title>BetScore | Profile</title>
+				<title>NBetsA | Profile</title>
+				<link rel='icon' type='image/x-icon' href='/static/favicon.ico' />
 			</Head>
 
 			<span className={styles.welcomeHeader}>Welcome {personalInfo.name}!</span>
@@ -140,9 +155,13 @@ export default function ProfileHome() {
 					<div className={styles.balanceContainer}>
 						<div className={styles.manageBalance}>
 							<span>Available Balance</span>
-							<span className={styles.balance}>
-								{formatter.format(personalInfo.balance)}
-							</span>
+							{personalInfo.balance > 0 ? (
+								<span className={styles.balance}>
+									{formatter.format(personalInfo.balance)}
+								</span>
+							) : (
+								<span className={styles.balance}>{formatter.format(0)}</span>
+							)}
 							<div className={styles.buttonContainer}>
 								<Link href={'/profile/deposit'} className={styles.link}>
 									<button className={styles.button}>Deposit</button>
@@ -158,4 +177,6 @@ export default function ProfileHome() {
 			</div>
 		</div>
 	);
-}
+};
+
+export default ProfileHome;

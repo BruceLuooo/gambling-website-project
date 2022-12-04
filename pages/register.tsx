@@ -4,56 +4,47 @@ import { useState } from 'react';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { db, auth } from '../firebase.config';
 import { setDoc, doc } from 'firebase/firestore';
-
-interface login {
-	name: string;
-	lastname: string;
-	email: string;
-	password: string;
-	confirmPassword: string;
-	balance: number;
-}
+import { useRegister } from '../hooks/loginAndRegister/useRegister';
+import Head from 'next/head';
+import Link from 'next/link';
 
 const Register = () => {
 	const router = useRouter();
-	const [registerInfo, setRegisterInfo] = useState<login>({
-		name: '',
-		lastname: '',
-		email: '',
-		password: '',
-		confirmPassword: '',
-		balance: 0,
-	});
+	const {
+		registerInfo,
+		updateRegisterInfo,
+		isFormCompleted,
+		doesPasswordMatch,
+		isPasswordLong,
+	} = useRegister();
+	const { email, password } = registerInfo;
 	const [error, setError] = useState({ active: false, message: '' });
 
-	const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setRegisterInfo(prev => ({
-			...prev,
-			[e.target.id]: e.target.value,
-		}));
-	};
-
-	const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+	const onSubmitForm = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
-		if (registerInfo.confirmPassword !== registerInfo.password) {
+		if (doesPasswordMatch()) {
 			return setError({ active: true, message: 'passwords do not match' });
 		}
-		if (
-			registerInfo.confirmPassword === '' ||
-			registerInfo.lastname === '' ||
-			registerInfo.email === '' ||
-			registerInfo.name === '' ||
-			registerInfo.password === ''
-		) {
+		if (isPasswordLong()) {
+			return setError({
+				active: true,
+				message: 'passwords must be 6+ characters',
+			});
+		}
+		if (isFormCompleted(registerInfo)) {
 			return setError({ active: true, message: 'Please fill in all fields' });
 		}
 
+		registerUser();
+	};
+
+	const registerUser = async () => {
 		try {
 			const userCredential = await createUserWithEmailAndPassword(
 				auth,
-				registerInfo.email,
-				registerInfo.password,
+				email,
+				password,
 			);
 			const user = userCredential.user;
 			const token = await user.getIdToken();
@@ -67,9 +58,13 @@ const Register = () => {
 	};
 
 	return (
-		<div className={styles.container}>
+		<main className={styles.container}>
+			<Head>
+				<title>NBetsA | Register</title>
+				<link rel='icon' type='image/x-icon' href='/static/favicon.ico' />
+			</Head>
 			<span className={styles.logoFont}>Create Your Account</span>
-			<form className={styles.formContainer} onSubmit={onSubmit}>
+			<form className={styles.formContainer} onSubmit={onSubmitForm}>
 				<div className={styles.fullName}>
 					<div className={styles.input}>
 						<label className={styles.label} htmlFor='name'>
@@ -79,7 +74,7 @@ const Register = () => {
 							className={styles.inputBox}
 							id='name'
 							type='text'
-							onChange={onChange}
+							onChange={updateRegisterInfo}
 						/>
 					</div>
 					<div className={styles.input}>
@@ -90,7 +85,7 @@ const Register = () => {
 							className={styles.inputBox}
 							id='lastname'
 							type='text'
-							onChange={onChange}
+							onChange={updateRegisterInfo}
 						/>
 					</div>
 				</div>
@@ -103,7 +98,7 @@ const Register = () => {
 						className={styles.inputBox}
 						id='email'
 						type='text'
-						onChange={onChange}
+						onChange={updateRegisterInfo}
 					/>
 				</div>
 				<div className={styles.fullName}>
@@ -115,7 +110,7 @@ const Register = () => {
 							className={styles.inputBox}
 							id='password'
 							type='password'
-							onChange={onChange}
+							onChange={updateRegisterInfo}
 						/>
 					</div>
 					<div className={styles.input}>
@@ -126,7 +121,7 @@ const Register = () => {
 							className={styles.inputBox}
 							id='confirmPassword'
 							type='password'
-							onChange={onChange}
+							onChange={updateRegisterInfo}
 						/>
 					</div>
 				</div>
@@ -140,9 +135,9 @@ const Register = () => {
 				</div>
 			</form>
 			<span>
-				Already have an account? Login <a href='/login'>Here</a>
+				Already have an account? Login <Link href='/login'>Here</Link>
 			</span>
-		</div>
+		</main>
 	);
 };
 

@@ -11,6 +11,7 @@ import useDelay from '../../hooks/useDelay';
 import { useRouter } from 'next/router';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import Head from 'next/head';
+import { usePlaceBets } from '../../hooks/placeBets/usePlaceBets';
 
 interface getGames {
 	id: string;
@@ -41,35 +42,22 @@ type InfoContext = {
 	removeFromBalance: Function;
 };
 
-interface PlaceBet {
-	id: string | undefined;
-	winningTeam: string | undefined;
-	odd: number;
-	betAmount: number;
-	estimatedWin: number;
-}
-
 export default function Placebet() {
+	const router = useRouter();
+	const { delay, loading, setLoading } = useDelay();
+	const { placeBet, selectedWinningTeam, setPlacedBetInfo, placedBetInfo } =
+		usePlaceBets();
+	const { winningTeam, odd, betAmount } = placedBetInfo;
+
+	const formatCurrency = new Intl.NumberFormat('en-US', {
+		style: 'currency',
+		currency: 'USD',
+	});
+
 	const { upcomingGames } = useContext(GetGamesContext) as GamesContext;
 	const { personalInfo, removeFromBalance } = useContext(
 		PersonalInfoContext,
 	) as InfoContext;
-	const { delay, loading, setLoading } = useDelay();
-	const router = useRouter();
-
-	const timeStamp = new Date();
-	// const date = timeStamp.toLocaleDateString('en-US', {
-	// 	weekday: 'long',
-	// 	month: 'long',
-	// 	day: 'numeric',
-	// 	hour: 'numeric',
-	// 	minute: 'numeric',
-	// });
-
-	const formatter = new Intl.NumberFormat('en-US', {
-		style: 'currency',
-		currency: 'USD',
-	});
 
 	useEffect(() => {
 		const queryString = window.location.search;
@@ -78,12 +66,12 @@ export default function Placebet() {
 		const find = upcomingGames.find(data => data.id === id);
 		if (find) {
 			setGameData(find);
-			setPlacedBet(prev => ({
+			setPlacedBetInfo(prev => ({
 				...prev,
 				id: find.id,
 			}));
 		}
-	}, [upcomingGames]);
+	}, [upcomingGames, setPlacedBetInfo]);
 
 	const [gameData, setGameData] = useState<getGames>({
 		id: '',
@@ -97,49 +85,25 @@ export default function Placebet() {
 			odds: 0,
 		},
 	});
-	const [placedBet, setPlacedBet] = useState<PlaceBet>({
-		id: '',
-		winningTeam: '',
-		odd: 0,
-		betAmount: 0,
-		estimatedWin: 0,
-	});
-
-	const selectedWinningTeam = (
-		winningTeam: string,
-		winningOdds: number,
-		losingTeam: string,
-		losingOdds: number,
-	) => {
-		setPlacedBet(prev => ({
-			...prev,
-			winningTeam: `${winningTeam} (${winningOdds})`,
-			losingTeam: `${losingTeam} (${losingOdds})`,
-			odd: winningOdds,
-		}));
-	};
-
-	const betAmount = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setPlacedBet(prev => ({
-			...prev,
-			[e.target.id]: e.target.valueAsNumber,
-			estimatedWin: e.target.valueAsNumber * placedBet.odd,
-		}));
-	};
+	const { homeTeam, awayTeam, startTime, teamOneOdds, teamTwoOdds } = gameData;
 
 	const submitBet = async () => {
 		setLoading(true);
 
+		setPlacedBetInfo(prev => ({
+			...prev,
+			estimatedWin: betAmount * odd,
+		}));
+
 		try {
-			const docRef = doc(
+			const docRef = collection(
 				db,
 				`/users/${auth.currentUser!.uid}/placedbets`,
-				`${placedBet.id}`,
 			);
 
-			await setDoc(docRef, placedBet);
+			await addDoc(docRef, placedBetInfo);
 
-			removeFromBalance(placedBet.betAmount);
+			removeFromBalance(betAmount);
 			await delay(3000);
 			router.push('/profile');
 		} catch (error) {
@@ -164,7 +128,7 @@ export default function Placebet() {
 				</title>
 			</Head>
 
-			<div className={styles.bettingContainer}>
+			<main className={styles.bettingContainer}>
 				<Link href='/'>
 					<Image
 						src={backArrow}
@@ -173,61 +137,61 @@ export default function Placebet() {
 						className={styles.backArrow}
 					/>
 				</Link>
-				<div className={styles.header}>
+				<section className={styles.header}>
 					<span className={styles.game}>
-						{gameData.homeTeam} - {gameData.awayTeam}
+						{homeTeam} - {awayTeam}
 					</span>
-					<span className={styles.date}>{gameData.startTime}</span>
-				</div>
-				<div className={styles.odds}>
+					<span className={styles.date}>{startTime}</span>
+				</section>
+				<section className={styles.odds}>
 					<div
 						className={`${styles.teamOdds} ${
-							placedBet.winningTeam === gameData.homeTeam && styles.selected
+							winningTeam === homeTeam && styles.selected
 						}`}
 						onClick={() =>
-							selectedWinningTeam(
-								gameData.homeTeam,
-								gameData.teamOneOdds.odds,
-								gameData.awayTeam,
-								gameData.teamTwoOdds.odds,
-							)
+							selectedWinningTeam({
+								winningTeam: homeTeam,
+								winningOdds: teamOneOdds.odds,
+								losingTeam: awayTeam,
+								losingOdds: teamTwoOdds.odds,
+							})
 						}
 					>
-						<span className={styles.overflow}>{gameData.homeTeam}</span>
-						<span>{gameData.teamOneOdds.odds}</span>
+						<span className={styles.overflow}>{homeTeam}</span>
+						<span>{teamOneOdds.odds}</span>
 					</div>
 					<div
 						className={`${styles.teamOdds} ${
-							placedBet.winningTeam === gameData.awayTeam && styles.selected
+							winningTeam === awayTeam && styles.selected
 						}`}
 						onClick={() =>
-							selectedWinningTeam(
-								gameData.awayTeam,
-								gameData.teamTwoOdds.odds,
-								gameData.homeTeam,
-								gameData.teamOneOdds.odds,
-							)
+							selectedWinningTeam({
+								winningTeam: awayTeam,
+								winningOdds: teamTwoOdds.odds,
+								losingTeam: homeTeam,
+								losingOdds: teamOneOdds.odds,
+							})
 						}
 					>
-						<span className={styles.overflow}>{gameData.awayTeam}</span>
-						<span>{gameData.teamTwoOdds.odds}</span>
+						<span className={styles.overflow}>{awayTeam}</span>
+						<span>{teamTwoOdds.odds}</span>
 					</div>
-				</div>
-				<div className={styles.placeBetContainer}>
+				</section>
+				<section className={styles.placeBetContainer}>
 					<span className={styles.titleLabel}>Winner (Incl. Overtime)</span>
 					<span className={styles.winnerLabel}>
-						{placedBet.winningTeam === ''
+						{placedBetInfo.winningTeam === ''
 							? 'Select Team'
-							: placedBet.winningTeam}
+							: placedBetInfo.winningTeam}
 					</span>
-					<span className={styles.oddsLabel}>{placedBet.odd}</span>
+					<span className={styles.oddsLabel}>{placedBetInfo.odd}</span>
 					<div className={styles.placedBet}>
 						<div className={styles.enterAmount}>
 							<input
 								type='number'
 								placeholder='Bet Amount'
 								id='betAmount'
-								onChange={betAmount}
+								onChange={placeBet}
 							/>
 							<span className={styles.dollarSign}>$</span>
 						</div>
@@ -236,31 +200,29 @@ export default function Placebet() {
 							<div>
 								<span>$</span>
 								<span>
-									{placedBet.betAmount === 0
-										? 0
-										: (placedBet.betAmount * placedBet.odd).toFixed(2)}
+									{betAmount === 0 ? 0 : (betAmount * odd).toFixed(2)}
 								</span>
 							</div>
 						</div>
 						<span className={styles.balance}>
-							Balance: {formatter.format(personalInfo.balance)}
+							Balance: {formatCurrency.format(personalInfo.balance)}
 						</span>
 					</div>
-				</div>
+				</section>
 				<button
 					className={styles.placeBet}
 					disabled={
 						//@ts-ignore
-						placedBet.betAmount === '' ||
-						placedBet.betAmount === 0 ||
-						placedBet.betAmount > personalInfo.balance ||
-						placedBet.winningTeam === ''
+						betAmount === '' ||
+						betAmount === 0 ||
+						betAmount > personalInfo.balance ||
+						winningTeam === ''
 					}
 					onClick={submitBet}
 				>
 					{personalInfo.name === '' ? 'Login To Place Bet' : 'Place Bet'}
 				</button>
-			</div>
+			</main>
 		</div>
 	);
 }

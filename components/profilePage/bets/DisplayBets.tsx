@@ -47,7 +47,7 @@ interface PersonalInfo {
 }
 
 export default function DisplayBets() {
-	const formatter = new Intl.NumberFormat('en-US', {
+	const formatCurrency = new Intl.NumberFormat('en-US', {
 		style: 'currency',
 		currency: 'USD',
 	});
@@ -61,6 +61,7 @@ export default function DisplayBets() {
 	useEffect(() => {
 		const getActiveBets = async () => {
 			const activeBetsLogRef: ActiveBets[] = [];
+			let totalWinning = 0;
 
 			const getCollection = collection(
 				db,
@@ -70,13 +71,13 @@ export default function DisplayBets() {
 			);
 
 			const docSnap = await getDocs(getCollection);
+
 			docSnap.forEach(async document => {
 				const match = completedGames.filter(
 					game => game.id === document.data().id,
 				);
 
 				if (match.length === 1) {
-					console.log(match[0]);
 					const data = {
 						betAmount: document.data().betAmount,
 						estimatedWin: document.data().estimatedWin,
@@ -97,21 +98,8 @@ export default function DisplayBets() {
 						.toLowerCase()
 						.includes(data.winner.toLowerCase());
 
-					console.log(
-						data.winningTeam.toLowerCase() + data.winner.toLowerCase(),
-					);
-
 					if (betWon) {
-						const currentUser = doc(db, 'users', `${auth.currentUser!.uid}`);
-						await updateDoc(currentUser, {
-							balance: personalInfo.balance + data.estimatedWin,
-						});
-
-						//@ts-ignore
-						setPersonalInfo(prev => ({
-							...prev,
-							balance: personalInfo.balance + data.estimatedWin,
-						}));
+						totalWinning += data.estimatedWin;
 					}
 
 					const docRef = doc(
@@ -124,7 +112,7 @@ export default function DisplayBets() {
 						doc(
 							db,
 							`users/${auth.currentUser?.uid}/placedbets`,
-							`${document.data().id}`,
+							`${document.id}`,
 						),
 					);
 				} else {
@@ -136,7 +124,20 @@ export default function DisplayBets() {
 					});
 				}
 			});
+
 			setActiveBets(activeBetsLogRef);
+			if (totalWinning > 0) {
+				const currentUser = doc(db, 'users', `${auth.currentUser!.uid}`);
+				await updateDoc(currentUser, {
+					balance: personalInfo.balance + totalWinning,
+				});
+
+				// @ts-ignore
+				setPersonalInfo(prev => ({
+					...prev,
+					balance: personalInfo.balance + totalWinning,
+				}));
+			}
 		};
 
 		onAuthStateChanged(auth, user => {
@@ -148,7 +149,7 @@ export default function DisplayBets() {
 
 	return (
 		<div className={styles.container}>
-			<div>
+			<div className={styles.bettingContainer}>
 				{activeBets.map((active, index) => (
 					<div className={styles.placedBetsContainer} key={index}>
 						<div className={styles.game}>
@@ -157,12 +158,12 @@ export default function DisplayBets() {
 							<span>{active.losingTeam}</span>
 						</div>
 						<span className={styles.padding}>
-							Bet: {formatter.format(active.betAmount)}
+							Bet: {formatCurrency.format(active.betAmount)}
 						</span>
 						<div className={styles.padding}>
 							<span>Payout: </span>
 							<span className={styles.payout}>
-								{formatter.format(active.payout)}
+								{formatCurrency.format(active.payout)}
 							</span>
 						</div>
 						<div>
