@@ -238,7 +238,7 @@ export default function Home({ upcomingGames }: Props) {
 							setTabs({ bet: false, news: false, liveScore: true })
 						}
 					>
-						Live Score
+						Live
 					</button>
 				</div>
 				<div className={styles.newsAndGamesContainer}>

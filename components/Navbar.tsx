@@ -81,6 +81,7 @@ export default function Navbar() {
 				router.push('/');
 			}
 		});
+		setOpenMenu(false);
 	};
 
 	return (
