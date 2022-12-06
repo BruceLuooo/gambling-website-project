@@ -56,7 +56,7 @@ export const GetGamesProvider = ({ children }: Props) => {
 				dateFormat: 'unix',
 			},
 			headers: {
-				'X-RapidAPI-Key': `2cbb011960msh3ff72f4f58249a1p127b8bjsnc63ffc1d70d9`,
+				'X-RapidAPI-Key': `${process.env.REACT_APP_LIVE_SPORTS_ODDS_KEY}`,
 				'X-RapidAPI-Host': 'odds.p.rapidapi.com',
 			},
 		};

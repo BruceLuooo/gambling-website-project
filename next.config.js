@@ -4,4 +4,10 @@ const nextConfig = {
 	swcMinify: true,
 };
 
-module.exports = nextConfig;
+module.exports = {
+	nextConfig: nextConfig,
+	env: {
+		REACT_APP_LIVE_SPORTS_ODDS_KEY:
+			'2cbb011960msh3ff72f4f58249a1p127b8bjsnc63ffc1d70d9',
+	},
+};
