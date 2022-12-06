@@ -59,7 +59,7 @@ export async function getStaticProps() {
 			dateFormat: 'unix',
 		},
 		headers: {
-			'X-RapidAPI-Key': key,
+			'X-RapidAPI-Key': `${process.env.REACT_APP_LIVE_SPORTS_ODDS_KEY}`,
 			'X-RapidAPI-Host': 'odds.p.rapidapi.com',
 		},
 	};
