@@ -67,10 +67,11 @@ export async function getStaticProps() {
 	const res = await axios.request(upcomingGames);
 	const data = res.data;
 
-	const convertDate = (time: number) => {
-		const milliseconds = time * 1000;
+	const changeTimeZone = (unix: number, timeZone: string) => {
+		const milliseconds = unix * 1000;
 		const timeStamp = new Date(milliseconds);
-		const date = timeStamp.toLocaleDateString('en-US', {
+		const date = timeStamp.toLocaleString('en-US', {
+			timeZone,
 			weekday: 'long',
 			month: 'long',
 			day: 'numeric',
@@ -89,7 +90,7 @@ export async function getStaticProps() {
 			id: data.id,
 			homeTeam: data.home_team,
 			awayTeam: data.away_team,
-			startTime: convertDate(data.commence_time),
+			startTime: changeTimeZone(data.commence_time, 'America/New_York'),
 			teamOneOdds: {
 				odds:
 					data.bookmakers[0].markets[0].outcomes[0].name === data.home_team
