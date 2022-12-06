@@ -27,7 +27,7 @@ export default function UpcomingGames({ upcomingGames }: Props) {
 			{upcomingGames.map((game, index) => (
 				<div className={styles.displayGameGridContainer} key={index}>
 					<div className={styles.dateContainer}>
-						<span className={`${styles.date} `}>{`${game.startTime}`}</span>
+						<span className={`${styles.date} `}>{game.startTime}</span>
 					</div>
 					<div className={styles.winnerContainer}>
 						<span className={styles.winnerSentence}>

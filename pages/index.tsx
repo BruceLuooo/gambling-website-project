@@ -67,11 +67,8 @@ export async function getStaticProps() {
 	const res = await axios.request(upcomingGames);
 	const data = res.data;
 
-	let information: getGames[] = [];
-	data.forEach((data: any) => {
-		if (data.bookmakers[0] === undefined) return;
-
-		const milliseconds = data.commence_time * 1000;
+	const convertDate = (time: number) => {
+		const milliseconds = time * 1000;
 		const timeStamp = new Date(milliseconds);
 		const date = timeStamp.toLocaleDateString('en-US', {
 			weekday: 'long',
@@ -81,11 +78,18 @@ export async function getStaticProps() {
 			minute: 'numeric',
 		});
 
+		return date;
+	};
+
+	let information: getGames[] = [];
+	data.forEach((data: any) => {
+		if (data.bookmakers[0] === undefined) return;
+
 		information.push({
 			id: data.id,
 			homeTeam: data.home_team,
 			awayTeam: data.away_team,
-			startTime: date,
+			startTime: convertDate(data.commence_time),
 			teamOneOdds: {
 				odds:
 					data.bookmakers[0].markets[0].outcomes[0].name === data.home_team
