@@ -20,11 +20,7 @@ export default function News() {
 	useEffect(() => {
 		const options = {
 			method: 'GET',
-			url: `https://nba-latest-news.p.rapidapi.com/news/source/${newsReporter}`,
-			headers: {
-				'X-RapidAPI-Key': '64c42d5081msh77e5f10405df956p13fbfbjsnbbeae69c6b06',
-				'X-RapidAPI-Host': 'nba-latest-news.p.rapidapi.com',
-			},
+			url: `https://nba-stories.onrender.com/articles?source=${newsReporter}`,
 		};
 
 		let information: News[] = [];
@@ -63,7 +59,7 @@ export default function News() {
 				</button>
 				<button
 					className={styles.button}
-					onClick={() => changeNewsReporter('bleacher_report')}
+					onClick={() => changeNewsReporter('bleacher-report')}
 				>
 					Bleacher Report
 				</button>
