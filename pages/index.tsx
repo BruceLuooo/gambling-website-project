@@ -110,6 +110,7 @@ export async function getStaticProps() {
 		props: {
 			upcomingGames: information,
 		},
+		revalidate: 10,
 	};
 }
 
