@@ -23,17 +23,9 @@ export default function News() {
 			url: `https://nba-stories.onrender.com/articles?source=${newsReporter}`,
 		};
 
-		let information: News[] = [];
-
 		axios.request(options).then(response => {
-			response.data.forEach((data: News) => {
-				information.push({
-					title: data.title,
-					url: data.url,
-					source: data.source,
-				});
-			});
-			setNews(information);
+			setNews(response.data);
+
 			setLoading(false);
 		});
 	}, [newsReporter]);
