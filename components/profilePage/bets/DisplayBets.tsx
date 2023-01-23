@@ -13,6 +13,7 @@ import { db, auth } from '../../../firebase.config';
 import { GetGamesContext } from '../../../context/GetGamesContext';
 import { PersonalInfoContext } from '../../../context/personalInfoContext';
 import { onAuthStateChanged } from 'firebase/auth';
+import Link from 'next/link';
 
 interface ActiveBets {
 	winningTeam: string;
@@ -147,31 +148,38 @@ export default function DisplayBets() {
 		});
 	}, []);
 
+	if (activeBets.length === 0)
+		return (
+			<div className={styles.container}>
+				<div className={styles.noBetsPlaced}>
+					<span>No Active Bets</span>
+					<Link className={styles.link} href={'/'}>
+						Place A Bet
+					</Link>
+				</div>
+			</div>
+		);
+
 	return (
 		<div className={styles.container}>
-			<div className={styles.bettingContainer}>
-				{activeBets.map((active, index) => (
-					<div className={styles.placedBetsContainer} key={index}>
-						<div className={styles.game}>
-							<span className={`${styles.winner}`}>{active.winningTeam}</span>
-							<span>-</span>
-							<span>{active.losingTeam}</span>
-						</div>
-						<span className={styles.padding}>
-							Bet: {formatCurrency.format(active.betAmount)}
-						</span>
-						<div className={styles.padding}>
-							<span>Payout: </span>
-							<span className={styles.payout}>
-								{formatCurrency.format(active.payout)}
-							</span>
-						</div>
-						<div>
-							<hr className={styles.lineSeperator} />
-						</div>
+			{activeBets.map((active, index) => (
+				<div className={styles.placedBetsContainer} key={index}>
+					<div className={styles.game}>
+						<span className={`${styles.winner}`}>{active.winningTeam}</span>
+						<span>-</span>
+						<span>{active.losingTeam}</span>
 					</div>
-				))}
-			</div>
+					<span className={styles.padding}>
+						Bet: {formatCurrency.format(active.betAmount)}
+					</span>
+					<div className={styles.padding}>
+						<span>Payout: </span>
+						<span className={styles.payout}>
+							{formatCurrency.format(active.payout)}
+						</span>
+					</div>
+				</div>
+			))}
 		</div>
 	);
 }

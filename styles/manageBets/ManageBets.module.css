@@ -1,0 +1,52 @@
+.mainContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 5rem 6rem;
+  max-width: 1200px;
+  width: 100%;
+  margin: auto;
+}
+
+.labelContainer{
+  display: flex;
+  position: relative;
+  gap: 1rem;
+}
+
+.labelContainer span {
+  font-size: 20px;
+}
+.labelContainer span:hover {
+  cursor: pointer;
+}
+
+.underline {
+  position: absolute;
+  bottom: -4px;
+  width: 100px;
+  height: 2px;
+  background-color: white;
+  transition:240ms;
+}
+.notActive {
+  transform: translate3d(0%, 0, 0);
+}
+.active {
+  transform: translate3d(157%, 0, 0);
+  width: 70px;
+}
+
+@media screen and (max-width: 1283px) {
+
+  .mainContainer {
+    gap: 1rem;
+  }
+
+}
+
+@media screen and (max-width: 768px) {
+  .mainContainer {
+    padding: 5rem 1rem;
+  }
+}

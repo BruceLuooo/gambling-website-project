@@ -80,9 +80,6 @@ export default function BettingHistory() {
 						<span>Payout: </span>
 						<span>{formatCurrency.format(bet.estimatedWin)}</span>
 					</div>
-					<div>
-						<hr className={styles.lineSeperator} />
-					</div>
 				</div>
 			))}
 		</div>

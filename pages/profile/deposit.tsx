@@ -88,6 +88,7 @@ export default function Deposit() {
 			type: 'Deposit',
 			amount: amount,
 			date: serverTimestamp(),
+			cardNumber: cardNumber.slice(15, 19),
 		});
 
 		//@ts-ignore
@@ -97,7 +98,7 @@ export default function Deposit() {
 		}));
 
 		await delay(3000);
-		router.push('/profile');
+		router.push('/profile/managebalance');
 	};
 
 	if (loading) {
@@ -121,7 +122,7 @@ export default function Deposit() {
 
 			<section className={styles.navigation}>
 				<span>
-					<Link href={'/profile'}>Profile</Link>
+					<Link href={'/profile/managebalance'}>Manage Balance</Link>
 				</span>
 				<span>/</span>
 				<span>Deposit</span>

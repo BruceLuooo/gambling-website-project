@@ -1,7 +1,7 @@
 .container {
   display: flex;
   flex-direction: column;
-  margin-top: 2rem;
+  margin-top: 16px;
 }
 
 .noTransaction {
@@ -12,10 +12,23 @@
 .transactionHistoryLabel{
   font-size: 30px;
   display: flex;
-  justify-content: center;
   margin-bottom: 2rem;
-  text-decoration: underline;
-  text-underline-offset: 6px;
+}
+
+.transactionHistory{
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+}
+.transactionHeader {
+  border: 1px solid white;
+}
+
+.transactionDate{
+  grid-column: 1/3;
+}
+
+.test{
+  grid-column: 1/3;
 }
 
 .transactionContainer {
@@ -25,24 +38,22 @@
   margin-bottom: 1rem;
 }
 
-.dateLabel {
+.gridContainer {
+  padding: 20px 15px;
+  font-size: 15px;
+}
+
+.cardInfo {
   display: flex;
-  width: 100%;
+  align-items: center;
+  gap: 10px;
 }
 
-.dateLabel span {
-  font-size: 14px;
-}
-
-.line {
-  width: 180px;
-  opacity: 50%;
-}
-
-.transaction {
-  display: flex;
-  justify-content: space-between;
-  padding: 0 1.5rem;
+.completed {
+  padding: 6px;
+  border-radius: 3px;
+  background-color: rgb(170, 233, 170);
+  color: rgb(0, 128, 0);
 }
 
 .red{
@@ -52,14 +63,52 @@
   color: green
 }
 
+
+@media screen and (max-width: 1283px) {
+  .transactionHistory{
+    align-items: center;
+  }
+
+  .test {
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+}
+
 @media screen and (max-width: 768px) {
   .line {
     width: 50px;
     opacity: 50%;
   }
 
-  .transactionHistoryLabel{
-    font-size: 24px;
+  .transactionHistory{
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    border-bottom: 1px solid white;
+  }
 
+  .transactionDate{
+    order: 5;
+  }
+
+  .test {
+    width: 250px;
+    overflow: unset;
+    white-space: unset;
+    text-overflow: unset;
+  }
+
+  .gridContainer {
+    padding: 20px 6px;
+    font-size: 15px;
+  }
+  .transactionHistory{
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .transactionHeader {
+    display: none;
   }
 }

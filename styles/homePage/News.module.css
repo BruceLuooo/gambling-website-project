@@ -31,6 +31,7 @@
   border: none;
   border-radius: 6px;
   font-size: 14px;
+  background-color: #6454da;
 }
 .button:hover {
   cursor: pointer;

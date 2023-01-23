@@ -105,7 +105,7 @@ export default function Placebet() {
 
 			removeFromBalance(betAmount);
 			await delay(3000);
-			router.push('/profile');
+			router.push('/profile/managebets');
 		} catch (error) {
 			console.log(error);
 		}

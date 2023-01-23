@@ -1,0 +1,120 @@
+.mainContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 5rem 6rem;
+  max-width: 1200px;
+  width: 100%;
+  margin: auto;
+  border-left: 1px solid white;
+  border-right: 1px solid white;
+}
+
+.layout {
+  display: flex;
+  flex-direction: column;
+}
+
+.balanceContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 2rem;
+  gap: 1rem;
+}
+
+.labelContainer{
+  display: flex;
+  position: relative;
+  gap: 1rem;
+}
+
+.labelContainer span {
+  font-size: 20px;
+}
+.labelContainer span:hover {
+  cursor: pointer;
+}
+
+.manageBalance {
+  display: flex;
+  align-items: center;
+}
+
+.balance {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  gap: 10px;
+}
+.balance span:nth-child(2) {
+  font-size: 15px;
+}
+.balance span:nth-child(1) {
+  font-size: 40px;
+}
+
+.buttonContainer {
+  display: flex;
+  gap: 1rem;
+  max-width: 250px;
+  width: 100%;
+  margin-left: 40px;
+}
+.link{
+  max-width: 100px;
+  width: 100%;
+  border: none;
+}
+.button{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 2.5rem;
+  transition: 0.3s;
+  border-radius: 2px;
+  background-color: #6454da;
+  cursor: pointer;
+}
+
+@media screen and (max-width: 1283px) {
+
+  .mainContainer {
+    gap: 1rem;
+    padding: 3rem 2rem;
+  }
+
+  .layout {
+    display: flex;
+    justify-content: center;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .mainContainer {
+    padding: 5rem 1rem;
+    border-left: unset;
+    border-right: unset;
+  }
+ 
+  .manageBalance {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .balance {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .balanceContainer {
+    padding: 0;
+  }
+
+  .buttonContainer {
+    max-width: 200px;
+    margin-left: unset;
+  }
+}

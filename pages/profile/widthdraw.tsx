@@ -96,6 +96,7 @@ export default function Widthdraw() {
 			type: 'Widthdraw',
 			amount: amount,
 			date: serverTimestamp(),
+			cardNumber: cardNumber.slice(15, 19),
 		});
 
 		setPersonalInfo((prev: Info) => ({
@@ -104,7 +105,7 @@ export default function Widthdraw() {
 		}));
 
 		await delay(3000);
-		router.push('/profile');
+		router.push('/profile/managebalance');
 	};
 
 	if (loading) {
@@ -128,7 +129,7 @@ export default function Widthdraw() {
 
 			<section className={styles.navigation}>
 				<span>
-					<Link href={'/profile'}>Profile</Link>
+					<Link href={'/profile/managebalance'}>Manage Balance</Link>
 				</span>
 				<span>/</span>
 				<span>Widthdraw</span>

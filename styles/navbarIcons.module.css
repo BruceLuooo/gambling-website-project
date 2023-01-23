@@ -1,0 +1,96 @@
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #30355e;
+  padding: 1rem 3rem;
+}
+
+.nav-item {
+  width: calc(60 * 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.iconButton{
+  --button-size: calc(16 * 0.5);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  padding: 5px;
+  margin: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: filter 300ms;
+}
+
+.dropdownMenu {
+  display: flex;
+  position: absolute;
+  z-index: 10;
+  right: 35px;
+  top: 40px;
+  border-radius: 8px;
+  width: 350px;
+  background-color: white;
+  overflow: hidden;
+  transition: height 0.3s ease;
+  padding: 0.5rem;
+}
+
+.menu {
+  width: 100%;
+}
+
+.menuItem {
+  height: 50px;
+  display: flex;
+  align-items: center;
+  color: black;
+  border-radius: 8px;
+  transition: 0.3s;
+  padding: 1rem;
+  cursor: pointer;
+}
+.menuHeader {
+  height: 50px;
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  transition: 0.3s;
+  padding: 0.5rem;
+  color: black;
+}
+.headerTitle {
+  font-size: 20px;
+}
+
+.iconLeft {
+  padding-right: 1rem;
+  background-color: unset;
+  cursor: pointer;
+}
+.iconRight {
+  margin-left: auto;
+  background-color: unset;
+  width: 10px;
+}
+
+.menuItem:hover {
+  background-color: #8f81e4;
+  color: white;
+}
+
+.back:hover {
+  cursor: pointer;
+  background-color: #8f81e4;
+}
+
+@media screen and (max-width: 768px) {
+  .dropdownMenu {
+    width: 250px;
+  }
+}

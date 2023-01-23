@@ -48,72 +48,6 @@ interface Props {
 	upcomingGames: getGames[];
 }
 
-export async function getStaticProps() {
-	const upcomingGames = {
-		method: 'GET',
-		url: 'https://odds.p.rapidapi.com/v4/sports/basketball_nba/odds',
-		params: {
-			regions: 'us',
-			oddsFormat: 'decimal',
-			markets: 'h2h',
-			dateFormat: 'unix',
-		},
-		headers: {
-			'X-RapidAPI-Key': `${process.env.REACT_APP_LIVE_SPORTS_ODDS_KEY}`,
-			'X-RapidAPI-Host': 'odds.p.rapidapi.com',
-		},
-	};
-
-	const res = await axios.request(upcomingGames);
-	const data = res.data;
-
-	const changeTimeZone = (unix: number, timeZone: string) => {
-		const milliseconds = unix * 1000;
-		const timeStamp = new Date(milliseconds);
-		const date = timeStamp.toLocaleString('en-US', {
-			timeZone,
-			weekday: 'long',
-			month: 'long',
-			day: 'numeric',
-			hour: 'numeric',
-			minute: 'numeric',
-		});
-
-		return date;
-	};
-
-	let information: getGames[] = [];
-	data.forEach((data: any) => {
-		if (data.bookmakers[0] === undefined) return;
-
-		information.push({
-			id: data.id,
-			homeTeam: data.home_team,
-			awayTeam: data.away_team,
-			startTime: changeTimeZone(data.commence_time, 'America/New_York'),
-			teamOneOdds: {
-				odds:
-					data.bookmakers[0].markets[0].outcomes[0].name === data.home_team
-						? data.bookmakers[0].markets[0].outcomes[0].price
-						: data.bookmakers[0].markets[0].outcomes[1].price,
-			},
-			teamTwoOdds: {
-				odds:
-					data.bookmakers[0].markets[0].outcomes[1].name === data.away_team
-						? data.bookmakers[0].markets[0].outcomes[1].price
-						: data.bookmakers[0].markets[0].outcomes[0].price,
-			},
-		});
-	});
-
-	return {
-		props: {
-			upcomingGames: information,
-		},
-		revalidate: 10,
-	};
-}
-
 export default function Home({ upcomingGames }: Props) {
 	const { setCompletedGames } = useContext(GetGamesContext) as GameContext;
 	const [games, setGames] = useState(true);
@@ -283,4 +217,70 @@ export default function Home({ upcomingGames }: Props) {
 			</main>
 		</div>
 	);
+}
+
+export async function getStaticProps() {
+	const upcomingGames = {
+		method: 'GET',
+		url: 'https://odds.p.rapidapi.com/v4/sports/basketball_nba/odds',
+		params: {
+			regions: 'us',
+			oddsFormat: 'decimal',
+			markets: 'h2h',
+			dateFormat: 'unix',
+		},
+		headers: {
+			'X-RapidAPI-Key': `${process.env.REACT_APP_LIVE_SPORTS_ODDS_KEY}`,
+			'X-RapidAPI-Host': 'odds.p.rapidapi.com',
+		},
+	};
+
+	const res = await axios.request(upcomingGames);
+	const data = res.data;
+
+	const changeTimeZone = (unix: number, timeZone: string) => {
+		const milliseconds = unix * 1000;
+		const timeStamp = new Date(milliseconds);
+		const date = timeStamp.toLocaleString('en-US', {
+			timeZone,
+			weekday: 'long',
+			month: 'long',
+			day: 'numeric',
+			hour: 'numeric',
+			minute: 'numeric',
+		});
+
+		return date;
+	};
+
+	let information: getGames[] = [];
+	data.forEach((data: any) => {
+		if (data.bookmakers[0] === undefined) return;
+
+		information.push({
+			id: data.id,
+			homeTeam: data.home_team,
+			awayTeam: data.away_team,
+			startTime: changeTimeZone(data.commence_time, 'America/New_York'),
+			teamOneOdds: {
+				odds:
+					data.bookmakers[0].markets[0].outcomes[0].name === data.home_team
+						? data.bookmakers[0].markets[0].outcomes[0].price
+						: data.bookmakers[0].markets[0].outcomes[1].price,
+			},
+			teamTwoOdds: {
+				odds:
+					data.bookmakers[0].markets[0].outcomes[1].name === data.away_team
+						? data.bookmakers[0].markets[0].outcomes[1].price
+						: data.bookmakers[0].markets[0].outcomes[0].price,
+			},
+		});
+	});
+
+	return {
+		props: {
+			upcomingGames: information,
+		},
+		revalidate: 10,
+	};
 }
